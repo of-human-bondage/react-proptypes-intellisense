@@ -4,7 +4,11 @@ import {
     ExtensionContext,
     CompletionItemProvider,
     ProviderResult,
-    CompletionItem
+    CompletionItem,
+    TextDocument,
+    Position,
+    CancellationToken,
+    CompletionContext
 } from "vscode";
 
 // this method is called when your extension is activated
@@ -12,7 +16,10 @@ import {
 export function activate(context: ExtensionContext) {
     languages.registerCompletionItemProvider("javascriptreact", {
         provideCompletionItems: (
-            ...args: any[]
+            document: TextDocument,
+            position: Position,
+            token: CancellationToken,
+            context: CompletionContext
         ): ProviderResult<CompletionItem[]> => {
             return null;
         }
