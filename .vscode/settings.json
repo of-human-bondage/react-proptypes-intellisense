@@ -5,5 +5,11 @@
     },
     "search.exclude": {
         "out": true // set this to false to include "out" folder in search results
-    }
+    },
+    "javascript.format.enable": true,
+    "prettier.eslintIntegration": true,
+    "prettier.tabWidth": 4,
+    "prettier.singleQuote": true,
+    "prettier.disableLanguages": ["json"],
+    "prettier.printWidth": 100
 }
