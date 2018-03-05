@@ -63,4 +63,45 @@ suite('Extension', () => {
             );
     }
     );
+    test('Find props for an imported component with static proptypes', () => {
+        const workspace = vscode.workspace;
+        const cursorPositionForComponent = new vscode.Position(15, 46);
+
+        const workspaceFolders = workspace!.workspaceFolders;
+        assert.ok(workspaceFolders!.length > 0);
+        const workspaceFolder = workspaceFolders![0];
+        assert.ok(
+            pathEquals(workspaceFolder.uri.fsPath, path.join(__dirname, '../../testWorkspace'))
+        );
+        const indexJsxPath = path.join(workspaceFolder.uri.fsPath, './index.jsx');
+        const indexJsxUriPath = vscode.Uri.file(indexJsxPath);
+
+        return workspace
+            .openTextDocument(indexJsxPath)
+            .then(vscode.window.showTextDocument, err => {
+                throw err;
+            })
+            .then(
+                document => {
+                    return vscode.commands
+                        .executeCommand<vscode.CompletionList>(
+                            'vscode.executeCompletionItemProvider',
+                            indexJsxUriPath,
+                            cursorPositionForComponent
+                        );
+                })
+            .then(
+                (result: vscode.CompletionList | undefined) => {
+                    proposal.forEach(elem => {
+                        const ifCompletionItemWasPresent = result!.items.find(
+                            (item: vscode.CompletionItem, index: number) => {
+                                return completionItemsEquals(elem, item);
+                            }
+                        );
+                        assert.notEqual(ifCompletionItemWasPresent, undefined,
+                            'Completion item ' + elem.label + ' was not present');
+                    });
+                }
+            );
+    });
 });
