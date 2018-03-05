@@ -23,7 +23,7 @@ suite('Extension', () => {
     ];
     test('Find props for an imported component', () => {
         const workspace = vscode.workspace;
-        const cursorPositionForComponent = new vscode.Position(13, 35);
+        const cursorPositionForComponent = new vscode.Position(14, 35);
 
         const workspaceFolders = workspace!.workspaceFolders;
         assert.ok(workspaceFolders!.length > 0);
