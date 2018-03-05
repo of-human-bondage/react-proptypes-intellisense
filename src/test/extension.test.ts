@@ -16,14 +16,15 @@ import * as path from 'path';
 // import * as myExtension from '../extension';
 
 suite('Extension', () => {
-    test('Find props for an imported component', done => {
+    const proposal = [
+        new vscode.CompletionItem('boolProp', vscode.CompletionItemKind.Property),
+        new vscode.CompletionItem('funcProp', vscode.CompletionItemKind.Property),
+        new vscode.CompletionItem('objectProp', vscode.CompletionItemKind.Property)
+    ];
+    test('Find props for an imported component', () => {
         const workspace = vscode.workspace;
         const cursorPositionForComponent = new vscode.Position(13, 35);
-        const proposal = [
-            new vscode.CompletionItem('boolProp', vscode.CompletionItemKind.Property),
-            new vscode.CompletionItem('funcProp', vscode.CompletionItemKind.Property),
-            new vscode.CompletionItem('objectProp', vscode.CompletionItemKind.Property)
-        ];
+
         const workspaceFolders = workspace!.workspaceFolders;
         assert.ok(workspaceFolders!.length > 0);
         const workspaceFolder = workspaceFolders![0];
@@ -32,39 +33,34 @@ suite('Extension', () => {
         );
         const indexJsxPath = path.join(workspaceFolder.uri.fsPath, './index.jsx');
         const indexJsxUriPath = vscode.Uri.file(indexJsxPath);
-        workspace
+
+        return workspace
             .openTextDocument(indexJsxPath)
             .then(vscode.window.showTextDocument, err => {
                 throw err;
             })
             .then(
                 document => {
-                    vscode.commands
+                    return vscode.commands
                         .executeCommand<vscode.CompletionList>(
                             'vscode.executeCompletionItemProvider',
                             indexJsxUriPath,
                             cursorPositionForComponent
-                        )
-                        .then(
-                            (result: vscode.CompletionList | undefined) => {
-                                proposal.forEach(elem => {
-                                    const ifCompletionItemWasPresent = result!.items.find(
-                                        (item: vscode.CompletionItem, index: number) => {
-                                            return completionItemsEquals(elem, item);
-                                        }
-                                    );
-                                    assert.ok(ifCompletionItemWasPresent);
-                                });
-                                done();
-                            },
-                            err => {
-                                throw err;
+                        );
+                })
+            .then(
+                (result: vscode.CompletionList | undefined) => {
+                    proposal.forEach(elem => {
+                        const ifCompletionItemWasPresent = result!.items.find(
+                            (item: vscode.CompletionItem, index: number) => {
+                                return completionItemsEquals(elem, item);
                             }
                         );
-                },
-                err => {
-                    throw err;
+                        assert.notEqual(ifCompletionItemWasPresent, undefined,
+                            'Completion item ' + elem.label + ' was not present');
+                    });
                 }
             );
-    });
+    }
+    );
 });
