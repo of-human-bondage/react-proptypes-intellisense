@@ -1,5 +1,6 @@
 import React from 'react';
 import './ComponentToImport';
+import './ComponentWithStaticPropTypes'
 
 export default class MainComponent extends React.Component {
     render() {
@@ -12,6 +13,7 @@ export default class MainComponent extends React.Component {
                     <li>No warning</li>
                 </ul>
                 <ComponentToImport />
+                <ComponentWithStaticPropTypes />
             </div>
         );
     }
