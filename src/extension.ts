@@ -1,23 +1,12 @@
-"use strict";
-import {
-    languages,
-    ExtensionContext,
-    CompletionItemProvider,
-    ProviderResult,
-    CompletionItem
-} from "vscode";
+'use strict';
+import { languages, ExtensionContext } from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+import PropTypesCompletionItemProvider from './PropTypesCompletionItemProvider';
+
 export function activate(context: ExtensionContext) {
-    languages.registerCompletionItemProvider("javascriptreact", {
-        provideCompletionItems: (
-            ...args: any[]
-        ): ProviderResult<CompletionItem[]> => {
-            return null;
-        }
-    });
+    const propTypesCompletionItemProvider = new PropTypesCompletionItemProvider();
+
+    languages.registerCompletionItemProvider('javascriptreact', propTypesCompletionItemProvider);
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {}
