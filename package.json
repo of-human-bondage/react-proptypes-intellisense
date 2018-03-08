@@ -23,11 +23,15 @@
     "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
+    "@types/babel-types": "^7.0.0",
+    "@types/babylon": "^6.16.2",
     "@types/mocha": "^2.2.42",
     "@types/node": "^7.0.43",
+    "@types/babel-traverse": "^6.25.3",
+    "babel-traverse": "^6.26.0",
     "babylon": "^6.18.0",
     "tslint": "^5.8.0",
-    "typescript": "^2.6.1",
-    "vscode": "^1.1.6"
+    "typescript": "^2.7.2",
+    "vscode": "^1.1.12"
   }
 }

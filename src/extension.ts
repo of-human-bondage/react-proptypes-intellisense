@@ -4,7 +4,7 @@ import { languages, ExtensionContext } from 'vscode';
 import PropTypesCompletionItemProvider from './PropTypesCompletionItemProvider';
 
 export function activate(context: ExtensionContext) {
-    const propTypesCompletionItemProvider = new PropTypesCompletionItemProvider(context);
+    const propTypesCompletionItemProvider = new PropTypesCompletionItemProvider();
 
     languages.registerCompletionItemProvider('javascriptreact', propTypesCompletionItemProvider);
 }
