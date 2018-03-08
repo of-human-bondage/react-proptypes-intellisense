@@ -11,6 +11,7 @@ before_install:
       sleep 3;
     fi
 
+# TODO: Check if we can usi the npm ci command for this
 install:
   - npm install
   - npm run vscode:prepublish
