@@ -14,6 +14,13 @@ export default class MainComponent extends React.Component {
                 </ul>
                 <ComponentToImport />
                 <ComponentWithStaticPropTypes />
+                <ComponentWithStaticPropTypes
+                    boolProp={true}
+                    
+                    funcProp={() => {
+                        console.log('cleofrom5to7');
+                    }}
+                />
             </div>
         );
     }
