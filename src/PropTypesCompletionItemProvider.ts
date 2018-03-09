@@ -37,7 +37,7 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         }
 
         for (let i = endTagPosition; i < documentText.length; i++) {
-            if (documentText[i] === END_TAG_CHARACTER) {
+            if (documentText[i] === END_TAG_CHARACTER || documentText[i] === START_TAG_CHARACTER) {
                 endTagPosition = i;
 
                 break;
