@@ -1,6 +1,6 @@
 import React from 'react';
 import ComponentToImport from './ComponentToImport';
-import ComponentWithStaticPropTypes from './ComponentWithStaticPropTypes'
+import ComponentWithStaticPropTypes from './ComponentWithStaticPropTypes';
 
 export default class MainComponent extends React.Component {
     render() {
