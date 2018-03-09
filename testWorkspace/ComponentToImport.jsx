@@ -12,7 +12,7 @@ export default class ComponentToImport extends React.Component {
 }
 
 ComponentToImport.propTypes = {
-  boolProp: PropTypes.bool,
-  funcProp: PropTypes.func,
-  objectProp: PropTypes.object
+    boolProp: PropTypes.bool,
+    funcProp: PropTypes.func,
+    objectProp: PropTypes.object
 };
