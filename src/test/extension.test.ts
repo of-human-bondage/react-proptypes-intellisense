@@ -15,47 +15,46 @@ import * as path from 'path';
 // import * as vscode from 'vscode';
 // import * as myExtension from '../extension';
 
-const checkCompletionItemsForSpecificPosition =
-    (cursorPositionForComponent: vscode.Position, proposals: Array<vscode.CompletionItem>) => {
-        const workspace = vscode.workspace;
+const checkCompletionItemsForSpecificPosition = (
+    cursorPositionForComponent: vscode.Position,
+    proposals: Array<vscode.CompletionItem>
+) => {
+    const workspace = vscode.workspace;
 
-        const workspaceFolders = workspace!.workspaceFolders;
-        assert.ok(workspaceFolders!.length > 0);
-        const workspaceFolder = workspaceFolders![0];
-        assert.ok(
-            pathEquals(workspaceFolder.uri.fsPath, path.join(__dirname, '../../testWorkspace'))
-        );
-        const indexJsxPath = path.join(workspaceFolder.uri.fsPath, './index.jsx');
-        const indexJsxUriPath = vscode.Uri.file(indexJsxPath);
+    const workspaceFolders = workspace!.workspaceFolders;
+    assert.ok(workspaceFolders!.length > 0);
+    const workspaceFolder = workspaceFolders![0];
+    assert.ok(pathEquals(workspaceFolder.uri.fsPath, path.join(__dirname, '../../testWorkspace')));
+    const indexJsxPath = path.join(workspaceFolder.uri.fsPath, './index.jsx');
+    const indexJsxUriPath = vscode.Uri.file(indexJsxPath);
 
-        return workspace
-            .openTextDocument(indexJsxPath)
-            .then(vscode.window.showTextDocument, err => {
-                throw err;
-            })
-            .then(
-                document => {
-                    return vscode.commands
-                        .executeCommand<vscode.CompletionList>(
-                            'vscode.executeCompletionItemProvider',
-                            indexJsxUriPath,
-                            cursorPositionForComponent
-                        );
-                })
-            .then(
-                (result: vscode.CompletionList | undefined) => {
-                    proposals.forEach(elem => {
-                        const ifCompletionItemWasPresent = result!.items.find(
-                            (item: vscode.CompletionItem, index: number) => {
-                                return completionItemsEquals(elem, item);
-                            }
-                        );
-                        assert.notEqual(ifCompletionItemWasPresent, undefined,
-                            'Completion item ' + elem.label + ' was not present');
-                    });
-                }
+    return workspace
+        .openTextDocument(indexJsxPath)
+        .then(vscode.window.showTextDocument, err => {
+            throw err;
+        })
+        .then(document => {
+            return vscode.commands.executeCommand<vscode.CompletionList>(
+                'vscode.executeCompletionItemProvider',
+                indexJsxUriPath,
+                cursorPositionForComponent
             );
-    };
+        })
+        .then((result: vscode.CompletionList | undefined) => {
+            proposals.forEach(elem => {
+                const ifCompletionItemWasPresent = result!.items.find(
+                    (item: vscode.CompletionItem, index: number) => {
+                        return completionItemsEquals(elem, item);
+                    }
+                );
+                assert.notEqual(
+                    ifCompletionItemWasPresent,
+                    undefined,
+                    'Completion item ' + elem.label + ' was not present'
+                );
+            });
+        });
+};
 
 suite('Extension', () => {
     const proposal = [
@@ -63,13 +62,26 @@ suite('Extension', () => {
         new vscode.CompletionItem('funcProp', vscode.CompletionItemKind.Property),
         new vscode.CompletionItem('objectProp', vscode.CompletionItemKind.Property)
     ];
-    test.skip('Find props for an imported component', () => { 
+    test.skip('Find props for an imported component', () => {
         const cursorPositionForComponent = new vscode.Position(14, 35);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
-    }
-    );
+    });
     test('Find props for an imported component with static proptypes', () => {
         const cursorPositionForComponent = new vscode.Position(15, 46);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
+    test(
+        'Find props for an imported component with static proptypes ' +
+            'that already has some props',
+        () => {
+            const cursorPositionForComponent = new vscode.Position(18, 20);
+            const proposalWithoutBoolsComponent: vscode.CompletionItem[] = proposal.filter(item => {
+                return item.label !== 'boolProp' && item.label !== 'funcProp';
+            });
+            return checkCompletionItemsForSpecificPosition(
+                cursorPositionForComponent,
+                proposalWithoutBoolsComponent
+            );
+        }
+    );
 });
