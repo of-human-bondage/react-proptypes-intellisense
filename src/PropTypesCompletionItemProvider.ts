@@ -24,7 +24,9 @@ const START_TAG_CHARACTER = '<';
 const END_TAG_CHARACTER = '>';
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
-    private getJsxTagFromCursorPosition(documentText: string, cursorPosition: number): string {
+    private getJsxTagFromCursorPosition(document: TextDocument, position: Position): string {
+        const documentText = document.getText();
+        const cursorPosition = document.offsetAt(position);
         let startTagPosition = cursorPosition;
         let endTagPosition = cursorPosition;
 
@@ -45,6 +47,19 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         }
 
         return documentText.slice(startTagPosition, endTagPosition + 1).replace(/\s{2,}/g, ' ');
+    }
+
+    private getPropTypesFromJsxTag(jsxTag: string): string[] {
+        /* 
+            this method may return not only proptypes
+            but also some other keywords that any jsx tag tag may contain
+        */
+        const regex = /[^\s]*=/g;
+        let parsedPropTypesWithEqualsSigns: RegExpMatchArray = jsxTag.match(regex) || [];
+
+        return parsedPropTypesWithEqualsSigns!.map(parsedPropType => {
+            return parsedPropType.replace('=', '');
+        });
     }
 
     private isReactComponent(nameOfJsxTag: string): boolean {
@@ -103,15 +118,6 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         return jsxTag.slice(1).split(' ')[0];
     }
 
-    private getNameOfJsxTagFromCursorPosition(document: TextDocument, position: Position): string {
-        const documentText = document.getText();
-        const cursorPosition = document.offsetAt(position);
-
-        const jsxTag = this.getJsxTagFromCursorPosition(documentText, cursorPosition);
-
-        return this.getNameOfJsxTag(jsxTag);
-    }
-
     private getPathOfComponent(componentName: string, document: TextDocument): string | undefined {
         const documentText = document.getText();
 
@@ -124,7 +130,11 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         return path.join(path.dirname(document.uri.fsPath), componentPath + '.jsx');
     }
 
-    private getComponentPropTypes(componentName: string, ast: File): string[] {
+    private getComponentPropTypes(
+        componentName: string,
+        ast: File,
+        alreadyProvidedProps: string[]
+    ): string[] {
         let component: ClassDeclaration | undefined;
         let scope;
         let propTypes: ClassProperty | undefined;
@@ -167,7 +177,10 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
                     const objectPropertyKey = <Identifier>path.node.key;
 
                     // without inner property
-                    if (path.parent === propTypes!.value) {
+                    if (
+                        path.parent === propTypes!.value &&
+                        alreadyProvidedProps.indexOf(objectPropertyKey.name) < 0
+                    ) {
                         result.push(objectPropertyKey.name);
                     }
                 }
@@ -184,7 +197,8 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         token: CancellationToken,
         context: CompletionContext
     ): CompletionItem[] {
-        const nameOfSelectedJsxTag = this.getNameOfJsxTagFromCursorPosition(document, position);
+        const jsxTag = this.getJsxTagFromCursorPosition(document, position);
+        const nameOfSelectedJsxTag = this.getNameOfJsxTag(jsxTag);
 
         const isReactComponent = this.isReactComponent(nameOfSelectedJsxTag);
         if (!isReactComponent) {
@@ -200,10 +214,13 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
 
         const ast = this.getAst(componentFileContent);
 
+        const parsedPropTypes = this.getPropTypesFromJsxTag(jsxTag);
+
         // TODO: remove map method, make more beautiful
-        // TODO: remove existing propTypes
-        return this.getComponentPropTypes(nameOfSelectedJsxTag, ast).map(propType => {
-            return new CompletionItem(propType, CompletionItemKind.Property);
-        });
+        return this.getComponentPropTypes(nameOfSelectedJsxTag, ast, parsedPropTypes).map(
+            propType => {
+                return new CompletionItem(propType, CompletionItemKind.Property);
+            }
+        );
     }
 }
