@@ -70,4 +70,18 @@ suite('Extension', () => {
         const cursorPositionForComponent = new vscode.Position(15, 46);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
+    test(
+        'Find props for an imported component with static proptypes ' +
+            'that already has some props',
+        () => {
+            const cursorPositionForComponent = new vscode.Position(18, 20);
+            const proposalWithoutBoolsComponent: vscode.CompletionItem[] = proposal.filter(item => {
+                return item.label !== 'boolProp' && item.label !== 'funcProp';
+            });
+            return checkCompletionItemsForSpecificPosition(
+                cursorPositionForComponent,
+                proposalWithoutBoolsComponent
+            );
+        }
+    );
 });
