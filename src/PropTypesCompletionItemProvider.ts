@@ -93,25 +93,23 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         documentText: string,
         name: string
     ): string | undefined {
-        // TODO: optimization of casting
-        const bodyOfAstFile = this.getAst(documentText).program.body;
-        const importDeclarations = <ImportDeclaration[]>bodyOfAstFile.filter(
-            (node: Node): boolean => node.type === 'ImportDeclaration'
-        );
+        const ast = this.getAst(documentText);
 
-        const importDeclarationOfComponent = importDeclarations.find(
-            (importDeclaration: ImportDeclaration): boolean => {
-                return !!importDeclaration.specifiers.find(
-                    specifier => specifier.local.name === name
-                );
+        let importDeclaration: ImportDeclaration | undefined;
+
+        babelTraverse(ast, {
+            ImportDefaultSpecifier(path) {
+                if (path.node.local.name === name) {
+                    importDeclaration = <ImportDeclaration>path.parent;
+                }
             }
-        );
+        });
 
-        if (importDeclarationOfComponent) {
-            return importDeclarationOfComponent.source.value;
+        if (!importDeclaration) {
+            return undefined;
         }
 
-        return undefined;
+        return importDeclaration.source.value;
     }
 
     private getNameOfJsxTag(jsxTag: string): string {
