@@ -10,14 +10,7 @@ import {
     CompletionItemKind
 } from 'vscode';
 import { parse } from 'babylon';
-import {
-    Node,
-    ImportDeclaration,
-    File,
-    ClassDeclaration,
-    Identifier,
-    ClassProperty
-} from 'babel-types';
+import { ImportDeclaration, File, ClassDeclaration, Identifier, ClassProperty } from 'babel-types';
 import babelTraverse from 'babel-traverse';
 
 const START_TAG_CHARACTER = '<';

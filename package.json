@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "publisher": "kv4sha",
   "engines": {
-    "vscode": "^1.20.0"
+    "vscode": "^1.21.0"
   },
   "categories": [
     "Other"
