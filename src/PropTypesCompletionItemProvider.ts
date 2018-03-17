@@ -1,5 +1,3 @@
-import * as path from 'path';
-import * as fs from 'fs';
 import {
     CompletionItemProvider,
     TextDocument,
@@ -7,67 +5,40 @@ import {
     CancellationToken,
     CompletionContext,
     CompletionItem,
-    CompletionItemKind
+    CompletionItemKind,
+    commands,
+    Location,
+    Uri,
+    workspace
 } from 'vscode';
 import { parse } from 'babylon';
-import {
-    Node,
-    ImportDeclaration,
-    File,
-    ClassDeclaration,
-    Identifier,
-    ClassProperty
-} from 'babel-types';
+import { File, ClassDeclaration, Identifier, ClassProperty } from 'babel-types';
 import babelTraverse from 'babel-traverse';
 
 const START_TAG_CHARACTER = '<';
 const END_TAG_CHARACTER = '>';
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
-    private getJsxTagFromCursorPosition(document: TextDocument, position: Position): string {
-        const documentText = document.getText();
-        const cursorPosition = document.offsetAt(position);
-        let startTagPosition = cursorPosition;
-        let endTagPosition = cursorPosition;
-
-        for (let i = startTagPosition; i > 0; i--) {
-            if (documentText[i] === START_TAG_CHARACTER) {
-                startTagPosition = i;
-
-                break;
-            }
-        }
-
-        for (let i = endTagPosition; i < documentText.length; i++) {
-            if (documentText[i] === END_TAG_CHARACTER || documentText[i] === START_TAG_CHARACTER) {
-                endTagPosition = i;
-
-                break;
-            }
-        }
-
-        return documentText.slice(startTagPosition, endTagPosition + 1).replace(/\s{2,}/g, ' ');
-    }
-
     private getPropTypesFromJsxTag(jsxTag: string): string[] {
-        /* 
+        /*
             this method may return not only proptypes
-            but also some other keywords that any jsx tag tag may contain
+            but also some other keywords that any jsx tag may contain
         */
-        const regex = /[^\s]*=/g;
-        let parsedPropTypesWithEqualsSigns: RegExpMatchArray = jsxTag.match(regex) || [];
+        const props = jsxTag.split(' ').slice(1);
 
-        return parsedPropTypesWithEqualsSigns!.map(parsedPropType => {
-            return parsedPropType.replace('=', '');
+        return props.map(prop => {
+            const indexOfEqualSign = prop.indexOf('=');
+
+            if (indexOfEqualSign === -1) {
+                return prop;
+            }
+
+            return prop.slice(0, indexOfEqualSign);
         });
     }
 
     private isReactComponent(nameOfJsxTag: string): boolean {
         return nameOfJsxTag[0] === nameOfJsxTag[0].toUpperCase();
-    }
-
-    private getFileContentByPath(filePath: string): string {
-        return fs.readFileSync(filePath, 'utf-8');
     }
 
     private getAst(fileText: string): File {
@@ -89,45 +60,8 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         });
     }
 
-    private getPathFromImportDeclarationsByName(
-        documentText: string,
-        name: string
-    ): string | undefined {
-        // TODO: optimization of casting
-        const bodyOfAstFile = this.getAst(documentText).program.body;
-        const importDeclarations = <ImportDeclaration[]>bodyOfAstFile.filter(
-            (node: Node): boolean => node.type === 'ImportDeclaration'
-        );
-
-        const importDeclarationOfComponent = importDeclarations.find(
-            (importDeclaration: ImportDeclaration): boolean => {
-                return !!importDeclaration.specifiers.find(
-                    specifier => specifier.local.name === name
-                );
-            }
-        );
-
-        if (importDeclarationOfComponent) {
-            return importDeclarationOfComponent.source.value;
-        }
-
-        return undefined;
-    }
-
     private getNameOfJsxTag(jsxTag: string): string {
-        return jsxTag.slice(1).split(' ')[0];
-    }
-
-    private getPathOfComponent(componentName: string, document: TextDocument): string | undefined {
-        const documentText = document.getText();
-
-        let componentPath = this.getPathFromImportDeclarationsByName(documentText, componentName);
-        if (!componentPath) {
-            return undefined;
-        }
-        // TODO: add jsconfig.json tsconfig.json
-        // FIXME: component may be in *.js file
-        return path.join(path.dirname(document.uri.fsPath), componentPath + '.jsx');
+        return jsxTag.split(' ')[0];
     }
 
     private getComponentPropTypes(
@@ -191,36 +125,98 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         return result;
     }
 
-    public provideCompletionItems(
+    private getStartTagPosition(document: TextDocument, position: Position): Position | undefined {
+        const documentText = document.getText();
+        const cursorPosition = document.offsetAt(position);
+
+        for (let i = cursorPosition; i > 0; i--) {
+            if (documentText[i] === START_TAG_CHARACTER) {
+                return document.positionAt(i + 1);
+            }
+        }
+    }
+
+    private getEndTagPosition(document: TextDocument, position: Position): Position {
+        const documentText = document.getText();
+        const cursorPosition = document.offsetAt(position);
+
+        for (let i = cursorPosition; i > 0; i++) {
+            if (documentText[i] === END_TAG_CHARACTER || documentText[i] === START_TAG_CHARACTER) {
+                if (documentText[i - 1] === '/') {
+                    return document.positionAt(i - 2);
+                }
+
+                return document.positionAt(i - 1);
+            }
+        }
+
+        return position;
+    }
+
+    private getJsxTag(
+        document: TextDocument,
+        startPosition: Position,
+        endPosition: Position
+    ): string {
+        const documentText = document.getText();
+        const start = document.offsetAt(startPosition);
+        const end = document.offsetAt(endPosition);
+
+        return documentText.slice(start, end + 1).replace(/\s{2,}/g, ' ');
+    }
+
+    private async getDefinition(
+        documentUri: Uri,
+        position: Position
+    ): Promise<Location | undefined> {
+        const definitions = <{}[]>await commands.executeCommand(
+            'vscode.executeDefinitionProvider',
+            documentUri,
+            position
+        );
+
+        if (!definitions.length) {
+            return undefined;
+        }
+
+        return <Location>definitions[0];
+    }
+
+    public async provideCompletionItems(
         document: TextDocument,
         position: Position,
         token: CancellationToken,
         context: CompletionContext
-    ): CompletionItem[] {
-        const jsxTag = this.getJsxTagFromCursorPosition(document, position);
-        const nameOfSelectedJsxTag = this.getNameOfJsxTag(jsxTag);
+    ): Promise<CompletionItem[]> {
+        const startTagPosition = this.getStartTagPosition(document, position);
+        if (!startTagPosition) {
+            return [];
+        }
 
-        const isReactComponent = this.isReactComponent(nameOfSelectedJsxTag);
+        const endTagPosition = this.getEndTagPosition(document, position);
+        const jsxTag = this.getJsxTag(document, startTagPosition, endTagPosition);
+        const nameOfJsxTag = this.getNameOfJsxTag(jsxTag);
+
+        const isReactComponent = this.isReactComponent(nameOfJsxTag);
         if (!isReactComponent) {
             return [];
         }
 
-        const pathOfSelectedComponent = this.getPathOfComponent(nameOfSelectedJsxTag, document);
-        if (!pathOfSelectedComponent) {
+        const tagDefinition = await this.getDefinition(document.uri, startTagPosition);
+        if (!tagDefinition) {
             return [];
         }
 
-        const componentFileContent = this.getFileContentByPath(pathOfSelectedComponent);
+        const componentTextDocument = await workspace.openTextDocument(tagDefinition.uri);
+        const componentName = componentTextDocument.getText(tagDefinition.range);
 
-        const ast = this.getAst(componentFileContent);
+        const ast = this.getAst(componentTextDocument.getText());
 
         const parsedPropTypes = this.getPropTypesFromJsxTag(jsxTag);
 
         // TODO: remove map method, make more beautiful
-        return this.getComponentPropTypes(nameOfSelectedJsxTag, ast, parsedPropTypes).map(
-            propType => {
-                return new CompletionItem(propType, CompletionItemKind.Property);
-            }
-        );
+        return this.getComponentPropTypes(componentName, ast, parsedPropTypes).map(propType => {
+            return new CompletionItem(propType, CompletionItemKind.Property);
+        });
     }
 }
