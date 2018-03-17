@@ -2,8 +2,6 @@ import {
     CompletionItemProvider,
     TextDocument,
     Position,
-    CancellationToken,
-    CompletionContext,
     CompletionItem,
     CompletionItemKind,
     commands,
@@ -12,28 +10,206 @@ import {
     workspace
 } from 'vscode';
 import { parse } from 'babylon';
-import { File, ClassDeclaration, Identifier, ClassProperty } from 'babel-types';
-import babelTraverse from 'babel-traverse';
-
-const START_TAG_CHARACTER = '<';
-const END_TAG_CHARACTER = '>';
+import {
+    File,
+    ClassDeclaration,
+    Identifier,
+    AssignmentExpression,
+    MemberExpression,
+    ObjectExpression,
+    JSXOpeningElement,
+    JSXIdentifier,
+    JSXAttribute
+} from 'babel-types';
+import babelTraverse, { Scope } from 'babel-traverse';
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
-    private getPropTypesFromJsxTag(jsxTag: string): string[] {
-        /*
-            this method may return not only proptypes
-            but also some other keywords that any jsx tag may contain
-        */
-        const props = jsxTag.split(' ').slice(1);
+    private getObjProperties(
+        obj: ObjectExpression,
+        scope: Scope,
+        propertiesToRemove: string[]
+    ): string[] {
+        const result: string[] = [];
 
-        return props.map(prop => {
-            const indexOfEqualSign = prop.indexOf('=');
+        babelTraverse(
+            obj,
+            {
+                ObjectProperty(path) {
+                    const objectPropertyKey = <Identifier>path.node.key;
 
-            if (indexOfEqualSign === -1) {
-                return prop;
+                    // without inner property
+                    if (
+                        path.parent === obj &&
+                        propertiesToRemove.indexOf(objectPropertyKey.name) < 0
+                    ) {
+                        result.push(objectPropertyKey.name);
+                    }
+                }
+            },
+            scope
+        );
+
+        return result;
+    }
+
+    private getComponentPropTypesFromStatic(
+        componentName: string,
+        ast: File,
+        alreadyProvidedProps: string[]
+    ): string[] {
+        let component: ClassDeclaration | undefined;
+        let scope: Scope | undefined;
+        let propTypes: ObjectExpression | undefined;
+
+        babelTraverse(ast, {
+            ClassDeclaration(path) {
+                if (path.node.id.name === componentName) {
+                    component = path.node;
+                    scope = path.scope;
+                }
             }
+        });
 
-            return prop.slice(0, indexOfEqualSign);
+        if (!component || !scope) {
+            return [];
+        }
+
+        babelTraverse(
+            component,
+            {
+                ClassProperty(path) {
+                    if (path.node.key.name === 'propTypes') {
+                        propTypes = <ObjectExpression>path.node.value;
+                    }
+                }
+            },
+            scope
+        );
+
+        if (!propTypes) {
+            return [];
+        }
+
+        return this.getObjProperties(propTypes, scope, alreadyProvidedProps);
+    }
+
+    private getComponentPropTypesFromProperty(
+        componentName: string,
+        ast: File,
+        alreadyProvidedProps: string[]
+    ): string[] {
+        let scope: Scope | undefined;
+        let propTypes: ObjectExpression | undefined;
+
+        babelTraverse(ast, {
+            ExpressionStatement(path) {
+                const expression = <AssignmentExpression>path.node.expression;
+                const left = <MemberExpression>expression.left;
+                const leftObject = <Identifier>left.object;
+                const leftProperty = <Identifier>left.property;
+
+                const right = <ObjectExpression>expression.right;
+
+                if (leftObject.name === componentName && leftProperty.name === 'propTypes') {
+                    propTypes = right;
+                    scope = path.scope;
+                }
+            }
+        });
+
+        if (!propTypes || !scope) {
+            return [];
+        }
+
+        return this.getObjProperties(propTypes, scope, alreadyProvidedProps);
+    }
+
+    private getComponentPropTypesFromPrototype(
+        componentName: string,
+        ast: File,
+        alreadyProvidedProps: string[]
+    ): string[] {
+        let scope: Scope | undefined;
+        let propTypes: ObjectExpression | undefined;
+
+        babelTraverse(ast, {
+            ExpressionStatement(path) {
+                const expression = <AssignmentExpression>path.node.expression;
+                const left = <MemberExpression>expression.left;
+                const leftObject = <Identifier>(<MemberExpression>left.object).object;
+                const leftProperty = <Identifier>left.property;
+
+                const right = <ObjectExpression>expression.right;
+
+                if (leftObject.name === componentName && leftProperty.name === 'propTypes') {
+                    propTypes = right;
+                    scope = path.scope;
+                }
+            }
+        });
+
+        if (!propTypes || !scope) {
+            return [];
+        }
+
+        return this.getObjProperties(propTypes, scope, alreadyProvidedProps);
+    }
+
+    private getComponentPropTypes(
+        componentName: string,
+        ast: File,
+        alreadyProvidedProps: string[]
+    ): string[] {
+        const componentPropTypesFromStatic = this.getComponentPropTypesFromStatic(
+            componentName,
+            ast,
+            alreadyProvidedProps
+        );
+        if (componentPropTypesFromStatic.length) {
+            return componentPropTypesFromStatic;
+        }
+
+        const componentPropTypesFromProperty = this.getComponentPropTypesFromProperty(
+            componentName,
+            ast,
+            alreadyProvidedProps
+        );
+        if (componentPropTypesFromProperty.length) {
+            return componentPropTypesFromProperty;
+        }
+
+        const componentPropTypesFromPrototype = this.getComponentPropTypesFromPrototype(
+            componentName,
+            ast,
+            alreadyProvidedProps
+        );
+        if (componentPropTypesFromPrototype.length) {
+            return componentPropTypesFromPrototype;
+        }
+
+        return [];
+    }
+
+    private async getDefinition(
+        documentUri: Uri,
+        position: Position
+    ): Promise<Location | undefined> {
+        const definitions = <{}[]>await commands.executeCommand(
+            'vscode.executeDefinitionProvider',
+            documentUri,
+            position
+        );
+
+        if (!definitions.length) {
+            return undefined;
+        }
+
+        return <Location>definitions[0];
+    }
+
+    private getPropTypesFromJsxTag(jsxOpeningElement: JSXOpeningElement): string[] {
+        return jsxOpeningElement.attributes.map((jsxAttribute: JSXAttribute): string => {
+            return (<JSXIdentifier>jsxAttribute.name).name;
         });
     }
 
@@ -60,148 +236,60 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         });
     }
 
-    private getNameOfJsxTag(jsxTag: string): string {
-        return jsxTag.split(' ')[0];
+    private getStartTagPosition(jsxOpeningElement: JSXOpeningElement): Position {
+        return new Position(
+            jsxOpeningElement.loc.start.line - 1,
+            jsxOpeningElement.loc.start.column + 1
+        );
     }
 
-    private getComponentPropTypes(
-        componentName: string,
-        ast: File,
-        alreadyProvidedProps: string[]
-    ): string[] {
-        let component: ClassDeclaration | undefined;
-        let scope;
-        let propTypes: ClassProperty | undefined;
+    private getNameOfJsxTag(jsxOpeningElement: JSXOpeningElement): string {
+        return (<JSXIdentifier>jsxOpeningElement.name).name;
+    }
 
-        let result: string[] = [];
+    private getJsxOpeningElement(
+        document: TextDocument,
+        position: Position
+    ): JSXOpeningElement | undefined {
+        const documentText = document.getText();
+        const cursorPosition = document.offsetAt(position);
+
+        const ast = this.getAst(documentText);
+
+        let result: JSXOpeningElement | undefined;
 
         babelTraverse(ast, {
-            ClassDeclaration(path) {
-                if (path.node.id.name === componentName) {
-                    component = path.node;
-                    scope = path.scope;
+            JSXOpeningElement(path) {
+                const jsxOpeningElement = <JSXOpeningElement>path.node;
+
+                if (
+                    cursorPosition > jsxOpeningElement.start &&
+                    cursorPosition < jsxOpeningElement.end
+                ) {
+                    result = jsxOpeningElement;
                 }
             }
         });
 
-        if (!component) {
-            return [];
-        }
-
-        babelTraverse(
-            component,
-            {
-                ClassProperty(path) {
-                    if (path.node.key.name === 'propTypes') {
-                        propTypes = path.node;
-                    }
-                }
-            },
-            scope
-        );
-
-        if (!propTypes) {
-            return [];
-        }
-
-        babelTraverse(
-            propTypes,
-            {
-                ObjectProperty(path) {
-                    const objectPropertyKey = <Identifier>path.node.key;
-
-                    // without inner property
-                    if (
-                        path.parent === propTypes!.value &&
-                        alreadyProvidedProps.indexOf(objectPropertyKey.name) < 0
-                    ) {
-                        result.push(objectPropertyKey.name);
-                    }
-                }
-            },
-            scope
-        );
-
         return result;
-    }
-
-    private getStartTagPosition(document: TextDocument, position: Position): Position | undefined {
-        const documentText = document.getText();
-        const cursorPosition = document.offsetAt(position);
-
-        for (let i = cursorPosition; i > 0; i--) {
-            if (documentText[i] === START_TAG_CHARACTER) {
-                return document.positionAt(i + 1);
-            }
-        }
-    }
-
-    private getEndTagPosition(document: TextDocument, position: Position): Position {
-        const documentText = document.getText();
-        const cursorPosition = document.offsetAt(position);
-
-        for (let i = cursorPosition; i > 0; i++) {
-            if (documentText[i] === END_TAG_CHARACTER || documentText[i] === START_TAG_CHARACTER) {
-                if (documentText[i - 1] === '/') {
-                    return document.positionAt(i - 2);
-                }
-
-                return document.positionAt(i - 1);
-            }
-        }
-
-        return position;
-    }
-
-    private getJsxTag(
-        document: TextDocument,
-        startPosition: Position,
-        endPosition: Position
-    ): string {
-        const documentText = document.getText();
-        const start = document.offsetAt(startPosition);
-        const end = document.offsetAt(endPosition);
-
-        return documentText.slice(start, end + 1).replace(/\s{2,}/g, ' ');
-    }
-
-    private async getDefinition(
-        documentUri: Uri,
-        position: Position
-    ): Promise<Location | undefined> {
-        const definitions = <{}[]>await commands.executeCommand(
-            'vscode.executeDefinitionProvider',
-            documentUri,
-            position
-        );
-
-        if (!definitions.length) {
-            return undefined;
-        }
-
-        return <Location>definitions[0];
     }
 
     public async provideCompletionItems(
         document: TextDocument,
-        position: Position,
-        token: CancellationToken,
-        context: CompletionContext
+        position: Position
     ): Promise<CompletionItem[]> {
-        const startTagPosition = this.getStartTagPosition(document, position);
-        if (!startTagPosition) {
+        const jsxOpeningElement = this.getJsxOpeningElement(document, position);
+        if (!jsxOpeningElement) {
             return [];
         }
 
-        const endTagPosition = this.getEndTagPosition(document, position);
-        const jsxTag = this.getJsxTag(document, startTagPosition, endTagPosition);
-        const nameOfJsxTag = this.getNameOfJsxTag(jsxTag);
-
+        const nameOfJsxTag = this.getNameOfJsxTag(jsxOpeningElement);
         const isReactComponent = this.isReactComponent(nameOfJsxTag);
         if (!isReactComponent) {
             return [];
         }
 
+        const startTagPosition = this.getStartTagPosition(jsxOpeningElement);
         const tagDefinition = await this.getDefinition(document.uri, startTagPosition);
         if (!tagDefinition) {
             return [];
@@ -209,14 +297,12 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
 
         const componentTextDocument = await workspace.openTextDocument(tagDefinition.uri);
         const componentName = componentTextDocument.getText(tagDefinition.range);
-
         const ast = this.getAst(componentTextDocument.getText());
 
-        const parsedPropTypes = this.getPropTypesFromJsxTag(jsxTag);
+        const parsedPropTypes = this.getPropTypesFromJsxTag(jsxOpeningElement);
 
-        // TODO: remove map method, make more beautiful
         return this.getComponentPropTypes(componentName, ast, parsedPropTypes).map(propType => {
-            return new CompletionItem(propType, CompletionItemKind.Property);
+            return new CompletionItem(propType, CompletionItemKind.Field);
         });
     }
 }
