@@ -17,7 +17,8 @@ import * as path from 'path';
 
 const checkCompletionItemsForSpecificPosition = (
     cursorPositionForComponent: vscode.Position,
-    proposals: Array<vscode.CompletionItem>
+    proposals: Array<vscode.CompletionItem>,
+    itemsShouldExist: boolean = true
 ) => {
     const workspace = vscode.workspace;
 
@@ -32,13 +33,11 @@ const checkCompletionItemsForSpecificPosition = (
         .openTextDocument(indexJsxPath)
         .then(vscode.window.showTextDocument)
         .then(document => {
-            //return setTimeoutPromise(() => {
             return vscode.commands.executeCommand<vscode.CompletionList>(
                 'vscode.executeCompletionItemProvider',
                 indexJsxUriPath,
                 cursorPositionForComponent
             );
-            // }, 5000);
         })
         .then((result: vscode.CompletionList | undefined) => {
             proposals.forEach(elem => {
@@ -47,11 +46,19 @@ const checkCompletionItemsForSpecificPosition = (
                         return completionItemsEquals(elem, item);
                     }
                 );
-                assert.notEqual(
-                    ifCompletionItemWasPresent,
-                    undefined,
-                    'Completion item ' + elem.label + ' was not present'
-                );
+                if (itemsShouldExist) {
+                    assert.notEqual(
+                        ifCompletionItemWasPresent,
+                        undefined,
+                        'Completion item ' + elem.label + ' was not present'
+                    );
+                } else {
+                    assert.equal(
+                        ifCompletionItemWasPresent,
+                        undefined,
+                        'Completion item ' + elem.label + ' was present'
+                    );
+                }
             });
         });
 };
@@ -97,6 +104,18 @@ suite('Extension', () => {
             return checkCompletionItemsForSpecificPosition(
                 cursorPositionForComponent,
                 proposalWithoutBoolItem
+            );
+        }
+    );
+    test(
+        'Find props for an imported component with static propTypes ' +
+            'that already has all props',
+        () => {
+            const cursorPositionForComponent = new vscode.Position(29, 20);
+            return checkCompletionItemsForSpecificPosition(
+                cursorPositionForComponent,
+                proposal,
+                false
             );
         }
     );

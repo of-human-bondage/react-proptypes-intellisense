@@ -21,6 +21,14 @@ export default class MainComponent extends React.Component {
                         console.log('cleofrom5to7');
                     }}
                 />
+                <ComponentWithStaticPropTypes
+                    boolProp={true}
+                    objectProp={ {film : "bandOfOutsiders"}}
+                    funcProp={() => {
+                        console.log('cleofrom5to7');
+                    }}
+                    
+                />
             </div>
         );
     }
