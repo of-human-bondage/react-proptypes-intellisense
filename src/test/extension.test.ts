@@ -30,15 +30,15 @@ const checkCompletionItemsForSpecificPosition = (
 
     return workspace
         .openTextDocument(indexJsxPath)
-        .then(vscode.window.showTextDocument, err => {
-            throw err;
-        })
+        .then(vscode.window.showTextDocument)
         .then(document => {
+            //return setTimeoutPromise(() => {
             return vscode.commands.executeCommand<vscode.CompletionList>(
                 'vscode.executeCompletionItemProvider',
                 indexJsxUriPath,
                 cursorPositionForComponent
             );
+            // }, 5000);
         })
         .then((result: vscode.CompletionList | undefined) => {
             proposals.forEach(elem => {
@@ -57,6 +57,22 @@ const checkCompletionItemsForSpecificPosition = (
 };
 
 suite('Extension', () => {
+    suiteSetup(done => {
+        const workspace = vscode.workspace;
+        const workspaceFolders = workspace!.workspaceFolders;
+        assert.ok(workspaceFolders!.length > 0);
+        const workspaceFolder = workspaceFolders![0];
+        assert.ok(
+            pathEquals(workspaceFolder.uri.fsPath, path.join(__dirname, '../../testWorkspace'))
+        );
+        const indexJsxPath = path.join(workspaceFolder.uri.fsPath, './index.jsx');
+        workspace
+            .openTextDocument(indexJsxPath)
+            .then(vscode.window.showTextDocument)
+            .then(() => {
+                done();
+            });
+    });
     const proposal = [
         new vscode.CompletionItem('boolProp', vscode.CompletionItemKind.Property),
         new vscode.CompletionItem('funcProp', vscode.CompletionItemKind.Property),
