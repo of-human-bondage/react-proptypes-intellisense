@@ -78,7 +78,7 @@ suite('Extension', () => {
         new vscode.CompletionItem('funcProp', vscode.CompletionItemKind.Field),
         new vscode.CompletionItem('objectProp', vscode.CompletionItemKind.Field)
     ];
-    test.skip('Find props for an imported component', () => {
+    test('Find props for an imported component', () => {
         const cursorPositionForComponent = new vscode.Position(14, 35);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
