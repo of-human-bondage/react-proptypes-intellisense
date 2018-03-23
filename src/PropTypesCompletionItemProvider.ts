@@ -7,7 +7,8 @@ import {
     commands,
     Location,
     Uri,
-    workspace
+    workspace,
+    Range
 } from 'vscode';
 import { parse } from 'babylon';
 import {
@@ -19,22 +20,47 @@ import {
     ObjectExpression,
     JSXOpeningElement,
     JSXIdentifier,
-    JSXAttribute
+    JSXAttribute,
+    SourceLocation,
+    ObjectProperty
 } from 'babel-types';
 import babelTraverse, { Scope } from 'babel-traverse';
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
-    private getObjProperties(
+    private sourceLocationToRange(sourceLocation: SourceLocation): Range {
+        return new Range(
+            new Position(sourceLocation.start.line - 1, sourceLocation.start.column),
+            new Position(sourceLocation.end.line - 1, sourceLocation.end.column)
+        );
+    }
+
+    private getCompletionItem(
+        objectProperty: ObjectProperty,
+        componentTextDocument: TextDocument
+    ): CompletionItem {
+        const objectPropertyKey = <Identifier>objectProperty.key;
+
+        const completionItem = new CompletionItem(objectPropertyKey.name, CompletionItemKind.Field);
+        completionItem.sortText = ''; // move on the top of the list
+        completionItem.detail = componentTextDocument.getText(
+            this.sourceLocationToRange(objectProperty.value.loc)
+        );
+
+        return completionItem;
+    }
+
+    private getCompletionItems(
+        componentTextDocument: TextDocument,
         obj: ObjectExpression,
         scope: Scope,
         propertiesToRemove: string[]
-    ): string[] {
-        const result: string[] = [];
+    ): CompletionItem[] {
+        const result: CompletionItem[] = [];
 
         babelTraverse(
             obj,
             {
-                ObjectProperty(path) {
+                ObjectProperty: path => {
                     const objectPropertyKey = <Identifier>path.node.key;
 
                     // without inner property
@@ -42,7 +68,7 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
                         path.parent === obj &&
                         propertiesToRemove.indexOf(objectPropertyKey.name) < 0
                     ) {
-                        result.push(objectPropertyKey.name);
+                        result.push(this.getCompletionItem(path.node, componentTextDocument));
                     }
                 }
             },
@@ -53,10 +79,11 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
     }
 
     private getComponentPropTypesFromStatic(
-        componentName: string,
+        componentTextDocument: TextDocument,
         ast: File,
+        componentName: string,
         alreadyProvidedProps: string[]
-    ): string[] {
+    ): CompletionItem[] {
         let component: ClassDeclaration | undefined;
         let scope: Scope | undefined;
         let propTypes: ObjectExpression | undefined;
@@ -90,14 +117,20 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
             return [];
         }
 
-        return this.getObjProperties(propTypes, scope, alreadyProvidedProps);
+        return this.getCompletionItems(
+            componentTextDocument,
+            propTypes,
+            scope,
+            alreadyProvidedProps
+        );
     }
 
     private getComponentPropTypesFromProperty(
-        componentName: string,
+        componentTextDocument: TextDocument,
         ast: File,
+        componentName: string,
         alreadyProvidedProps: string[]
-    ): string[] {
+    ): CompletionItem[] {
         let scope: Scope | undefined;
         let propTypes: ObjectExpression | undefined;
 
@@ -121,14 +154,20 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
             return [];
         }
 
-        return this.getObjProperties(propTypes, scope, alreadyProvidedProps);
+        return this.getCompletionItems(
+            componentTextDocument,
+            propTypes,
+            scope,
+            alreadyProvidedProps
+        );
     }
 
     private getComponentPropTypesFromPrototype(
-        componentName: string,
+        componentTextDocument: TextDocument,
         ast: File,
+        componentName: string,
         alreadyProvidedProps: string[]
-    ): string[] {
+    ): CompletionItem[] {
         let scope: Scope | undefined;
         let propTypes: ObjectExpression | undefined;
 
@@ -152,17 +191,25 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
             return [];
         }
 
-        return this.getObjProperties(propTypes, scope, alreadyProvidedProps);
+        return this.getCompletionItems(
+            componentTextDocument,
+            propTypes,
+            scope,
+            alreadyProvidedProps
+        );
     }
 
     private getComponentPropTypes(
+        componentTextDocument: TextDocument,
         componentName: string,
-        ast: File,
         alreadyProvidedProps: string[]
-    ): string[] {
+    ): CompletionItem[] {
+        const ast = this.getAst(componentTextDocument.getText());
+
         const componentPropTypesFromStatic = this.getComponentPropTypesFromStatic(
-            componentName,
+            componentTextDocument,
             ast,
+            componentName,
             alreadyProvidedProps
         );
         if (componentPropTypesFromStatic.length) {
@@ -170,8 +217,9 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         }
 
         const componentPropTypesFromProperty = this.getComponentPropTypesFromProperty(
-            componentName,
+            componentTextDocument,
             ast,
+            componentName,
             alreadyProvidedProps
         );
         if (componentPropTypesFromProperty.length) {
@@ -179,8 +227,9 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         }
 
         const componentPropTypesFromPrototype = this.getComponentPropTypesFromPrototype(
-            componentName,
+            componentTextDocument,
             ast,
+            componentName,
             alreadyProvidedProps
         );
         if (componentPropTypesFromPrototype.length) {
@@ -297,12 +346,9 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
 
         const componentTextDocument = await workspace.openTextDocument(tagDefinition.uri);
         const componentName = componentTextDocument.getText(tagDefinition.range);
-        const ast = this.getAst(componentTextDocument.getText());
 
         const parsedPropTypes = this.getPropTypesFromJsxTag(jsxOpeningElement);
 
-        return this.getComponentPropTypes(componentName, ast, parsedPropTypes).map(propType => {
-            return new CompletionItem(propType, CompletionItemKind.Field);
-        });
+        return this.getComponentPropTypes(componentTextDocument, componentName, parsedPropTypes);
     }
 }
