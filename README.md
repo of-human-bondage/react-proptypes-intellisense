@@ -1,8 +1,7 @@
 # react-proptypes-intellisense README
 
-[![Build Status](https://travis-ci.org/of-human-bondage/react-proptypes-intellisense.svg?branch=master)](https://travis-ci.org/of-human-bondage/react-proptypes-intellisense)
+[![Build Status](https://travis-ci.org/of-human-bondage/react-proptypes-intellisense.svg?branch=master)](https://travis-ci.org/of-human-bondage/react-proptypes-intellisense) [![Build status](https://ci.appveyor.com/api/projects/status/gxr50is52835550r?svg=true)](https://ci.appveyor.com/project/tempora-mutantur/react-proptypes-intellisense) [![codecov](https://codecov.io/gh/of-human-bondage/react-proptypes-intellisense/branch/master/graph/badge.svg)](https://codecov.io/gh/of-human-bondage/react-proptypes-intellisense)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/gxr50is52835550r?svg=true)](https://ci.appveyor.com/project/tempora-mutantur/react-proptypes-intellisense)
 
 This is the README for your extension "react-proptypes-intellisense". After writing up a brief description, we recommend including the following sections.
 
