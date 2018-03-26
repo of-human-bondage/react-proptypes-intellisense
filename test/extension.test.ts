@@ -65,6 +65,7 @@ const checkCompletionItemsForSpecificPosition = (
 
 suite('Extension', () => {
     suiteSetup(done => {
+        const componentNamePosition = new vscode.Position(14, 17);
         const workspace = vscode.workspace;
         const workspaceFolders = workspace!.workspaceFolders;
         assert.ok(workspaceFolders!.length > 0);
@@ -73,11 +74,28 @@ suite('Extension', () => {
             pathEquals(workspaceFolder.uri.fsPath, path.join(__dirname, '../../testWorkspace'))
         );
         const indexJsxPath = path.join(workspaceFolder.uri.fsPath, './index.jsx');
+        const indexJsxUriPath = vscode.Uri.file(indexJsxPath);
+        const waitForDefinitions = (done: () => void) => {
+            vscode.commands
+            .executeCommand(
+                'vscode.executeDefinitionProvider',
+                indexJsxUriPath,
+                componentNamePosition
+            )
+            .then((definitions: any) => {
+                if (!definitions || !definitions.length) {
+                    console.log('Wait until definitions could be read');
+                    waitForDefinitions(done);
+                } else {
+                    done();
+                }
+            });
+        };
         workspace
             .openTextDocument(indexJsxPath)
             .then(vscode.window.showTextDocument)
             .then(() => {
-                done();
+                waitForDefinitions(done);
             });
     });
     const proposal = [
