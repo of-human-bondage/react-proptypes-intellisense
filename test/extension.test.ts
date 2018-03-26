@@ -65,7 +65,7 @@ const checkCompletionItemsForSpecificPosition = (
 
 suite('Extension', () => {
     suiteSetup(done => {
-        const componentNamePosition = new vscode.Position(14, 17);
+        const componentNamePosition = new vscode.Position(15, 17);
         const workspace = vscode.workspace;
         const workspaceFolders = workspace!.workspaceFolders;
         assert.ok(workspaceFolders!.length > 0);
@@ -104,11 +104,11 @@ suite('Extension', () => {
         new vscode.CompletionItem('objectProp', vscode.CompletionItemKind.Field)
     ];
     test('Find props for an imported component', () => {
-        const cursorPositionForComponent = new vscode.Position(14, 35);
+        const cursorPositionForComponent = new vscode.Position(15, 35);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
     test('Find props for an imported component with static propTypes', () => {
-        const cursorPositionForComponent = new vscode.Position(15, 46);
+        const cursorPositionForComponent = new vscode.Position(16, 46);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
     test(
@@ -129,11 +129,21 @@ suite('Extension', () => {
         'Find props for an imported component with static propTypes ' +
             'that already has all props',
         () => {
-            const cursorPositionForComponent = new vscode.Position(29, 20);
+            const cursorPositionForComponent = new vscode.Position(30, 20);
             return checkCompletionItemsForSpecificPosition(
                 cursorPositionForComponent,
                 proposal,
                 false
+            );
+        }
+    );
+    test(
+        'Find props for a component with propTypes inside the prototype',
+        () => {
+            const cursorPositionForComponent = new vscode.Position(32, 47);
+            return checkCompletionItemsForSpecificPosition(
+                cursorPositionForComponent,
+                proposal
             );
         }
     );

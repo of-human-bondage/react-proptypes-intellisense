@@ -1,5 +1,6 @@
 import React from 'react';
 import ComponentToImport from './ComponentToImport';
+import ComponentWithPropsInPrototype from './ComponentWithPropsInPrototype';
 import ComponentWithStaticPropTypes from './ComponentWithStaticPropTypes';
 
 export default class MainComponent extends React.Component {
@@ -29,6 +30,7 @@ export default class MainComponent extends React.Component {
                     }}
                     
                 />
+                <ComponentWithPropsInPrototype />
             </div>
         );
     }
