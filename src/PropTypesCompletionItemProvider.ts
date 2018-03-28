@@ -11,7 +11,7 @@ import {
 import { JSXOpeningElement, JSXIdentifier, JSXAttribute } from 'babel-types';
 import babelTraverse from 'babel-traverse';
 
-import PropTypes from './PropTypes';
+import getPropTypes from './getPropTypes';
 import { getAst } from './utils';
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
@@ -102,12 +102,11 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
 
         const parsedPropTypes = this.getPropTypesFromJsxTag(jsxOpeningElement);
 
-        const propTypes = (await new PropTypes(
-            tagDefinition.uri,
-            tagDefinition.range
-        ).getPropTypes()).filter(propType => {
-            return parsedPropTypes.indexOf(propType.label) === -1;
-        });
+        const propTypes = (await getPropTypes(tagDefinition.uri, tagDefinition.range)).filter(
+            propType => {
+                return parsedPropTypes.indexOf(propType.label) === -1;
+            }
+        );
 
         return propTypes;
     }
