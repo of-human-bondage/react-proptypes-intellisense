@@ -32,8 +32,8 @@
     "babel-traverse": "^6.26.0",
     "babylon": "^6.18.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.7.2",
-    "vscode": "^1.1.13"
+    "typescript": "^2.8.1",
+    "vscode": "^1.1.14"
   },
   "dependencies": {
     "@types/glob": "^5.0.35",
