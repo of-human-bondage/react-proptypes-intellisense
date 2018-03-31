@@ -37,3 +37,13 @@ const PRETTIER_OPTIONS: prettier.Options = {
 export const formatJSString = (jsString: string): string => {
     return prettier.format(jsString, PRETTIER_OPTIONS);
 };
+
+export const isRequiredPropType = (propType: string): boolean => {
+    const propTypeSeparatedByDot = propType.split('.');
+
+    if (propTypeSeparatedByDot[propTypeSeparatedByDot.length - 1] === 'isRequired') {
+        return true;
+    }
+
+    return false;
+};
