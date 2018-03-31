@@ -24,13 +24,15 @@
     "testOnWindows": "npm run compile && SET CODE_TESTS_WORKSPACE=./testWorkspace/ && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
+    "@types/babel-traverse": "^6.25.3",
     "@types/babel-types": "^7.0.1",
     "@types/babylon": "^6.16.2",
     "@types/mocha": "^2.2.48",
     "@types/node": "^9.4.7",
-    "@types/babel-traverse": "^6.25.3",
+    "@types/prettier": "^1.10.0",
     "babel-traverse": "^6.26.0",
     "babylon": "^6.18.0",
+    "prettier": "^1.11.1",
     "tslint": "^5.9.1",
     "typescript": "^2.8.1",
     "vscode": "^1.1.14"
