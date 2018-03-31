@@ -3,7 +3,7 @@ import { TextDocument, CompletionItem, CompletionItemKind, MarkdownString, comma
 import { ObjectExpression, ObjectProperty, Identifier } from 'babel-types';
 import babelTraverse, { Scope } from 'babel-traverse';
 
-import { sourceLocationToRange, formatJSString } from './utils';
+import { sourceLocationToRange, formatJSString, isRequiredPropType } from './utils';
 
 const getMarkdownString = (str: string): MarkdownString => {
     return new MarkdownString().appendCodeblock(formatJSString(str));
@@ -13,11 +13,18 @@ const getCompletionItem = (
     objectProperty: ObjectProperty,
     componentTextDocument: TextDocument
 ): CompletionItem => {
-    const objectPropertyKey = <Identifier>objectProperty.key;
+    const objectPropertyName = (<Identifier>objectProperty.key).name;
+    const objectPropertyValue = componentTextDocument.getText(
+        sourceLocationToRange(objectProperty.value.loc)
+    );
 
-    const completionItem = new CompletionItem(objectPropertyKey.name, CompletionItemKind.Field);
+    const propTypeName = `${objectPropertyName}${
+        isRequiredPropType(objectPropertyValue) ? '?' : ''
+    }`;
+
+    const completionItem = new CompletionItem(propTypeName, CompletionItemKind.Field);
     completionItem.sortText = ''; // move on the top of the list
-    completionItem.detail = `(property) ${objectPropertyKey.name}`;
+    completionItem.detail = `(property) ${propTypeName}`;
     completionItem.documentation = getMarkdownString(
         componentTextDocument.getText(sourceLocationToRange(objectProperty.value.loc))
     );
