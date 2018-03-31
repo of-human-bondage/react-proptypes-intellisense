@@ -8,8 +8,8 @@ import {
     Uri
 } from 'vscode';
 
-import { JSXOpeningElement, JSXIdentifier, JSXAttribute } from 'babel-types';
-import babelTraverse from 'babel-traverse';
+import { JSXOpeningElement, JSXIdentifier, JSXAttribute, Node } from 'babel-types';
+import babelTraverse, { Scope } from 'babel-traverse';
 
 import getPropTypes from './getPropTypes';
 import { getAst } from './utils';
@@ -52,6 +52,37 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         return (<JSXIdentifier>jsxOpeningElement.name).name;
     }
 
+    private isCursorPositionInJsxOpeningElement(
+        cursorPosition: number,
+        jsxOpeningElement: JSXOpeningElement
+    ): boolean {
+        return cursorPosition > jsxOpeningElement.start && cursorPosition < jsxOpeningElement.end;
+    }
+
+    private isCursorPositionInJsxAttribute(
+        cursorPosition: number,
+        node: Node,
+        scope: Scope
+    ): boolean {
+        let result: boolean = true;
+
+        babelTraverse(
+            node,
+            {
+                JSXAttribute(path) {
+                    const jsxAttribute = path.node;
+
+                    if (cursorPosition > jsxAttribute.start && cursorPosition < jsxAttribute.end) {
+                        result = false;
+                    }
+                }
+            },
+            scope
+        );
+
+        return result;
+    }
+
     private getJsxOpeningElement(
         document: TextDocument,
         position: Position
@@ -64,12 +95,16 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         let result: JSXOpeningElement | undefined;
 
         babelTraverse(ast, {
-            JSXOpeningElement(path) {
-                const jsxOpeningElement = <JSXOpeningElement>path.node;
+            JSXOpeningElement: path => {
+                const jsxOpeningElement = path.node;
 
                 if (
-                    cursorPosition > jsxOpeningElement.start &&
-                    cursorPosition < jsxOpeningElement.end
+                    this.isCursorPositionInJsxOpeningElement(cursorPosition, jsxOpeningElement) &&
+                    this.isCursorPositionInJsxAttribute(
+                        cursorPosition,
+                        jsxOpeningElement,
+                        path.scope
+                    )
                 ) {
                     result = jsxOpeningElement;
                 }
