@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ComponentToImport from './ComponentToImport';
 import ComponentWithPropsInPrototype from './ComponentWithPropsInPrototype';
 import ComponentWithStaticPropTypes from './ComponentWithStaticPropTypes';
@@ -31,6 +32,21 @@ export default class MainComponent extends React.Component {
                     
                 />
                 <ComponentWithPropsInPrototype />
+                <ComponentInTheSameFile />
+            </div>
+        );
+    }
+}
+
+class ComponentInTheSameFile extends React.Component {
+    static propTypes = {
+        boolProp: PropTypes.bool.isRequired
+    };
+
+    render() {
+        return (
+            <div className="classislav">
+                <h1>Turnstile is: {this.props.isGood}</h1>
             </div>
         );
     }

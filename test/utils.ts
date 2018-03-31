@@ -14,6 +14,7 @@ export function completionItemsEquals(
     completionItem2: CompletionItem
 ) {
     return (
+        completionItem1.detail === completionItem2.detail &&
         completionItem1.label === completionItem2.label &&
         completionItem1.kind === completionItem2.kind
     );
