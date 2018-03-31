@@ -139,7 +139,7 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
 
         const propTypes = (await getPropTypes(tagDefinition.uri, tagDefinition.range)).filter(
             propType => {
-                return parsedPropTypes.indexOf(propType.label) === -1;
+                return parsedPropTypes.indexOf(<string>propType.insertText) === -1;
             }
         );
 
