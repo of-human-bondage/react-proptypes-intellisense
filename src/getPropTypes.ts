@@ -1,4 +1,4 @@
-import { Uri, Range, workspace, TextDocument } from 'vscode';
+import { Uri, Range, workspace, TextDocument, CompletionItem } from 'vscode';
 
 import { getAst } from './utils';
 
@@ -17,7 +17,10 @@ const getComponentName = (
     return componentTextDocument.getText(componentNameLocation);
 };
 
-export default async (componentUri: Uri, componentNameLocation: Range) => {
+export default async (
+    componentUri: Uri,
+    componentNameLocation: Range
+): Promise<CompletionItem[]> => {
     const componentTextDocument = await getComponentTextDocument(componentUri);
     const componentName = getComponentName(componentTextDocument, componentNameLocation);
 
