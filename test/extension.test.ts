@@ -65,7 +65,7 @@ const checkCompletionItemsForSpecificPosition = (
 
 suite('Extension', () => {
     suiteSetup(done => {
-        const componentNamePosition = new vscode.Position(15, 17);
+        const componentNamePosition = new vscode.Position(16, 17);
         const workspace = vscode.workspace;
         const workspaceFolders = workspace!.workspaceFolders;
         assert.ok(workspaceFolders!.length > 0);
@@ -77,19 +77,19 @@ suite('Extension', () => {
         const indexJsxUriPath = vscode.Uri.file(indexJsxPath);
         const waitForDefinitions = (done: () => void) => {
             vscode.commands
-            .executeCommand(
-                'vscode.executeDefinitionProvider',
-                indexJsxUriPath,
-                componentNamePosition
-            )
-            .then((definitions: any) => {
-                if (!definitions || !definitions.length) {
-                    console.log('Wait until definitions could be read');
-                    waitForDefinitions(done);
-                } else {
-                    done();
-                }
-            });
+                .executeCommand(
+                    'vscode.executeDefinitionProvider',
+                    indexJsxUriPath,
+                    componentNamePosition
+                )
+                .then((definitions: any) => {
+                    if (!definitions || !definitions.length) {
+                        console.log('Wait until definitions could be read');
+                        waitForDefinitions(done);
+                    } else {
+                        done();
+                    }
+                });
         };
         workspace
             .openTextDocument(indexJsxPath)
@@ -98,24 +98,29 @@ suite('Extension', () => {
                 waitForDefinitions(done);
             });
     });
-    const proposal = [
-        new vscode.CompletionItem('boolProp', vscode.CompletionItemKind.Field),
-        new vscode.CompletionItem('funcProp', vscode.CompletionItemKind.Field),
-        new vscode.CompletionItem('objectProp', vscode.CompletionItemKind.Field)
-    ];
+    let boolCompletionItem = new vscode.CompletionItem('boolProp', vscode.CompletionItemKind.Field);
+    boolCompletionItem.detail = 'PropTypes.bool';
+    let funcCompletionItem = new vscode.CompletionItem('funcProp', vscode.CompletionItemKind.Field);
+    funcCompletionItem.detail = 'PropTypes.func';
+    let objCompletionItem = new vscode.CompletionItem(
+        'objectProp',
+        vscode.CompletionItemKind.Field
+    );
+    objCompletionItem.detail = 'PropTypes.object';
+    const proposal = [boolCompletionItem, funcCompletionItem, objCompletionItem];
     test('Find props for an imported component', () => {
-        const cursorPositionForComponent = new vscode.Position(15, 35);
+        const cursorPositionForComponent = new vscode.Position(16, 35);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
     test('Find props for an imported component with static propTypes', () => {
-        const cursorPositionForComponent = new vscode.Position(16, 46);
+        const cursorPositionForComponent = new vscode.Position(17, 46);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
     test(
         'Find props for an imported component with static propTypes ' +
             'that already has some props',
         () => {
-            const cursorPositionForComponent = new vscode.Position(18, 20);
+            const cursorPositionForComponent = new vscode.Position(19, 20);
             const proposalWithoutBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
                 return item.label !== 'boolProp' && item.label !== 'funcProp';
             });
@@ -129,7 +134,7 @@ suite('Extension', () => {
         'Find props for an imported component with static propTypes ' +
             'that already has all props',
         () => {
-            const cursorPositionForComponent = new vscode.Position(30, 20);
+            const cursorPositionForComponent = new vscode.Position(31, 20);
             return checkCompletionItemsForSpecificPosition(
                 cursorPositionForComponent,
                 proposal,
@@ -137,14 +142,21 @@ suite('Extension', () => {
             );
         }
     );
-    test(
-        'Find props for a component with propTypes inside the prototype',
+    test('Find props for a component with propTypes inside the prototype', () => {
+        const cursorPositionForComponent = new vscode.Position(33, 47);
+        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
+    });
+
+    test.skip(
+        'Find props for a component in the same document with a component ' +
+            'where the suggestion was triggered from. It has a required prop',
         () => {
-            const cursorPositionForComponent = new vscode.Position(32, 47);
-            return checkCompletionItemsForSpecificPosition(
-                cursorPositionForComponent,
-                proposal
-            );
+            const proposalWithBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
+                return item.label === 'boolProp';
+            });
+            proposalWithBoolItem[0].label = "PropTypes.bool.isRequired";
+            const cursorPositionForComponent = new vscode.Position(34, 40);
+            return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
         }
     );
 });
