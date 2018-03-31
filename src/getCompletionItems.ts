@@ -31,13 +31,14 @@ const getCompletionItem = (
     );
 
     const propTypeName = `${objectPropertyName}${
-        isRequiredPropType(objectPropertyValue) ? '?' : ''
+        isRequiredPropType(objectPropertyValue) ? '' : '?'
     }`;
     const detail = getMinimalPropTypeDetail(objectPropertyValue);
     const documentation = getMarkdownString(objectPropertyValue);
 
     const completionItem = new CompletionItem(propTypeName, CompletionItemKind.Field);
     completionItem.sortText = ''; // move on the top of the list
+    completionItem.insertText = objectPropertyName;
     completionItem.detail = detail;
     completionItem.documentation = documentation;
 
