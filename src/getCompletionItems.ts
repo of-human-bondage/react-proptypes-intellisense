@@ -3,19 +3,10 @@ import { TextDocument, CompletionItem, CompletionItemKind, MarkdownString, comma
 import { ObjectExpression, ObjectProperty, Identifier } from 'babel-types';
 import babelTraverse, { Scope } from 'babel-traverse';
 
-import * as prettier from 'prettier';
-
-import { sourceLocationToRange } from './utils';
-
-const PRETTIER_OPTIONS: prettier.Options = {
-    tabWidth: 4,
-    semi: false
-};
+import { sourceLocationToRange, formatJSString } from './utils';
 
 const getMarkdownString = (str: string): MarkdownString => {
-    const formattedStr = prettier.format(str, PRETTIER_OPTIONS);
-
-    return new MarkdownString().appendCodeblock(formattedStr);
+    return new MarkdownString().appendCodeblock(formatJSString(str));
 };
 
 const getCompletionItem = (
