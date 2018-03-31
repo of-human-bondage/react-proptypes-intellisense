@@ -31,7 +31,8 @@ export const sourceLocationToRange = (sourceLocation: SourceLocation): Range => 
 
 const PRETTIER_OPTIONS: prettier.Options = {
     tabWidth: 4,
-    semi: false
+    semi: false,
+    printWidth: 40
 };
 
 export const formatJSString = (jsString: string): string => {
