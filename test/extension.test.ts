@@ -98,15 +98,28 @@ suite('Extension', () => {
                 waitForDefinitions(done);
             });
     });
-    let boolCompletionItem = new vscode.CompletionItem('boolProp', vscode.CompletionItemKind.Field);
+
+    let boolCompletionItem = new vscode.CompletionItem(
+        'boolProp?',
+        vscode.CompletionItemKind.Field
+    );
     boolCompletionItem.detail = 'PropTypes.bool';
-    let funcCompletionItem = new vscode.CompletionItem('funcProp', vscode.CompletionItemKind.Field);
+    boolCompletionItem.insertText = 'boolProp';
+
+    let funcCompletionItem = new vscode.CompletionItem(
+        'funcProp?',
+        vscode.CompletionItemKind.Field
+    );
     funcCompletionItem.detail = 'PropTypes.func';
+    funcCompletionItem.insertText = 'funcProp';
+
     let objCompletionItem = new vscode.CompletionItem(
-        'objectProp',
+        'objectProp?',
         vscode.CompletionItemKind.Field
     );
     objCompletionItem.detail = 'PropTypes.object';
+    objCompletionItem.insertText = 'objectProp';
+
     const proposal = [boolCompletionItem, funcCompletionItem, objCompletionItem];
     test('Find props for an imported component', () => {
         const cursorPositionForComponent = new vscode.Position(16, 35);
@@ -122,7 +135,7 @@ suite('Extension', () => {
         () => {
             const cursorPositionForComponent = new vscode.Position(19, 20);
             const proposalWithoutBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
-                return item.label !== 'boolProp' && item.label !== 'funcProp';
+                return item.label !== 'boolProp?' && item.label !== 'funcProp?';
             });
             return checkCompletionItemsForSpecificPosition(
                 cursorPositionForComponent,
@@ -154,7 +167,7 @@ suite('Extension', () => {
             const proposalWithBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
                 return item.label === 'boolProp';
             });
-            proposalWithBoolItem[0].label = "PropTypes.bool.isRequired";
+            proposalWithBoolItem[0].label = 'PropTypes.bool.isRequired';
             const cursorPositionForComponent = new vscode.Position(34, 40);
             return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
         }
