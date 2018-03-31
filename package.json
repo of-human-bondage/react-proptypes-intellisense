@@ -17,11 +17,11 @@
   "main": "./out/src/extension",
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile": "rimraf ./out && tsc -p ./",
+    "watch": "rimraf ./out && tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "npm run compile && CODE_TESTS_WORKSPACE=./testWorkspace/ node ./node_modules/vscode/bin/test",
-    "testOnWindows": "npm run compile && SET CODE_TESTS_WORKSPACE=./testWorkspace/ && node ./node_modules/vscode/bin/test"
+    "test": "rimraf ./out && npm run compile && CODE_TESTS_WORKSPACE=./testWorkspace/ node ./node_modules/vscode/bin/test",
+    "testOnWindows": "rimraf ./out && npm run compile && SET CODE_TESTS_WORKSPACE=./testWorkspace/ && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
     "@types/babel-traverse": "^6.25.3",
@@ -42,6 +42,7 @@
     "decache": "^4.4.0",
     "glob": "^7.1.2",
     "istanbul": "^0.4.5",
-    "remap-istanbul": "^0.11.0"
+    "remap-istanbul": "^0.11.0",
+    "rimraf": "^2.6.2"
   }
 }
