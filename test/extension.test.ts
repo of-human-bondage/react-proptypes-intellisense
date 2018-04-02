@@ -166,16 +166,16 @@ suite('Extension', () => {
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
     });
 
-    test.skip(
+    test(
         'Find props for a component in the same document with a component ' +
             'where the suggestion was triggered from. It has a required prop',
         () => {
-            const proposalWithBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
-                return item.label === 'boolProp?';
-            });
-            proposalWithBoolItem[0].label = 'PropTypes.bool.isRequired';
+            const proposal = new vscode.CompletionItem('boolProp', vscode.CompletionItemKind.Field);
+            proposal.detail = 'PropTypes.bool.isRequired';
+            proposal.insertText = 'boolProp';
+
             const cursorPositionForComponent = new vscode.Position(36, 40);
-            return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
+            return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [proposal]);
         }
     );
 });
