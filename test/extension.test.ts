@@ -65,7 +65,7 @@ const checkCompletionItemsForSpecificPosition = (
 
 suite('Extension', () => {
     suiteSetup(done => {
-        const componentNamePosition = new vscode.Position(16, 17);
+        const componentNamePosition = new vscode.Position(18, 17);
         const workspace = vscode.workspace;
         const workspaceFolders = workspace!.workspaceFolders;
         assert.ok(workspaceFolders!.length > 0);
@@ -122,18 +122,18 @@ suite('Extension', () => {
 
     const proposal = [boolCompletionItem, funcCompletionItem, objCompletionItem];
     test('Find props for an imported component', () => {
-        const cursorPositionForComponent = new vscode.Position(16, 35);
+        const cursorPositionForComponent = new vscode.Position(18, 35);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
     test('Find props for an imported component with static propTypes', () => {
-        const cursorPositionForComponent = new vscode.Position(17, 46);
+        const cursorPositionForComponent = new vscode.Position(19, 46);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
     });
     test(
         'Find props for an imported component with static propTypes ' +
             'that already has some props',
         () => {
-            const cursorPositionForComponent = new vscode.Position(19, 20);
+            const cursorPositionForComponent = new vscode.Position(21, 20);
             const proposalWithoutBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
                 return item.label !== 'boolProp?' && item.label !== 'funcProp?';
             });
@@ -147,7 +147,7 @@ suite('Extension', () => {
         'Find props for an imported component with static propTypes ' +
             'that already has all props',
         () => {
-            const cursorPositionForComponent = new vscode.Position(31, 20);
+            const cursorPositionForComponent = new vscode.Position(33, 20);
             return checkCompletionItemsForSpecificPosition(
                 cursorPositionForComponent,
                 proposal,
@@ -156,8 +156,14 @@ suite('Extension', () => {
         }
     );
     test('Find props for a component with propTypes inside the prototype', () => {
-        const cursorPositionForComponent = new vscode.Position(33, 47);
+        const cursorPositionForComponent = new vscode.Position(35, 47);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
+    });
+
+    test('Find props for an imported component without propTypes', () => {
+        const cursorPositionForComponent = new vscode.Position(37, 39);
+
+        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
     });
 
     test.skip(
@@ -165,10 +171,10 @@ suite('Extension', () => {
             'where the suggestion was triggered from. It has a required prop',
         () => {
             const proposalWithBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
-                return item.label === 'boolProp';
+                return item.label === 'boolProp?';
             });
             proposalWithBoolItem[0].label = 'PropTypes.bool.isRequired';
-            const cursorPositionForComponent = new vscode.Position(34, 40);
+            const cursorPositionForComponent = new vscode.Position(36, 40);
             return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
         }
     );
