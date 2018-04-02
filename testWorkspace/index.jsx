@@ -9,7 +9,7 @@ import ComponentWithoutProps from './ComponentWithoutProps';
 export default class MainComponent extends React.Component {
     render() {
         return (
-            <div className="classislav">
+            <div  className="classislav">
                 <h1>My name is {this.props.name}</h1>
                 <ul>
                     <li>Turnstile</li>
@@ -36,6 +36,8 @@ export default class MainComponent extends React.Component {
                 <ComponentWithPropsInPrototype />
                 <ComponentInTheSameFile />
                 <ComponentWithoutProps />
+                <NotImportedComponent />
+
             </div>
         );
     }
@@ -43,6 +45,9 @@ export default class MainComponent extends React.Component {
 
 class ComponentInTheSameFile extends React.Component {
     static propTypes = {
+        shapeProp: PropTypes.shape({
+            super: PropTypes.string,
+        }).isRequired,
         boolProp: PropTypes.bool.isRequired
     };
 

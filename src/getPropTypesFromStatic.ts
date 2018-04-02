@@ -23,12 +23,8 @@ export default (
         }
     });
 
-    if (!component || !scope) {
-        return [];
-    }
-
     babelTraverse(
-        component,
+        component!,
         {
             ClassProperty(path) {
                 if (path.node.key.name === 'propTypes') {
@@ -43,5 +39,5 @@ export default (
         return [];
     }
 
-    return getCompletionItems(componentTextDocument, propTypes, scope);
+    return getCompletionItems(componentTextDocument, propTypes, scope!);
 };

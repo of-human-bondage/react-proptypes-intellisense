@@ -178,4 +178,44 @@ suite('Extension', () => {
             return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [proposal]);
         }
     );
+
+    test(
+        'Find props for a component in the same document with a component ' +
+            'where the suggestion was triggered from. It has a shape prop',
+        () => {
+            const proposal = new vscode.CompletionItem(
+                'shapeProp',
+                vscode.CompletionItemKind.Field
+            );
+            proposal.detail = 'PropTypes.shape(...).isRequired';
+            proposal.insertText = 'shapeProp';
+
+            const cursorPositionForComponent = new vscode.Position(36, 40);
+            return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [proposal]);
+        }
+    );
+
+    test('Find props outside a component', () => {
+        const cursorPositionForComponent = new vscode.Position(38, 16);
+
+        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+    });
+
+    test('Find props for <div></div>', () => {
+        const cursorPositionForComponent = new vscode.Position(11, 17);
+
+        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+    });
+
+    test("Find props for isn't imported component", () => {
+        const cursorPositionForComponent = new vscode.Position(38, 38);
+
+        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+    });
+
+    test('Find props for a component inside component attribute', () => {
+        const cursorPositionForComponent = new vscode.Position(23, 37);
+
+        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+    });
 });
