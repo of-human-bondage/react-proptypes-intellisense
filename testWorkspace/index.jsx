@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import ComponentToImport from './ComponentToImport';
 import ComponentWithPropsInPrototype from './ComponentWithPropsInPrototype';
 import ComponentWithStaticPropTypes from './ComponentWithStaticPropTypes';
+import ComponentWithoutProps from './ComponentWithoutProps';
 
 export default class MainComponent extends React.Component {
     render() {
@@ -18,14 +20,14 @@ export default class MainComponent extends React.Component {
                 <ComponentWithStaticPropTypes />
                 <ComponentWithStaticPropTypes
                     boolProp={true}
-                    
+
                     funcProp={() => {
                         console.log('cleofrom5to7');
                     }}
                 />
                 <ComponentWithStaticPropTypes
                     boolProp={true}
-                    objectProp={ {film : "bandOfOutsiders"}}
+                    objectProp={{ film: 'bandOfOutsiders' }}
                     funcProp={() => {
                         console.log('cleofrom5to7');
                     }}
@@ -33,6 +35,7 @@ export default class MainComponent extends React.Component {
                 />
                 <ComponentWithPropsInPrototype />
                 <ComponentInTheSameFile />
+                <ComponentWithoutProps />
             </div>
         );
     }
