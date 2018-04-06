@@ -23,19 +23,15 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         return (<JSXIdentifier>jsxOpeningElement.name).name;
     }
 
-    private isCursorPositionInJsxOpeningElement(
+    private isCursorInJsxOpeningElement(
         cursorPosition: number,
         jsxOpeningElement: JSXOpeningElement
     ): boolean {
         return cursorPosition > jsxOpeningElement.start && cursorPosition < jsxOpeningElement.end;
     }
 
-    private isCursorPositionInJsxAttribute(
-        cursorPosition: number,
-        node: Node,
-        scope: Scope
-    ): boolean {
-        let result: boolean = true;
+    private isCursorInJsxAttribute(cursorPosition: number, node: Node, scope: Scope): boolean {
+        let result: boolean = false;
 
         babelTraverse(
             node,
@@ -44,7 +40,7 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
                     const jsxAttribute = path.node;
 
                     if (cursorPosition > jsxAttribute.start && cursorPosition < jsxAttribute.end) {
-                        result = false;
+                        result = true;
                     }
                 }
             },
@@ -69,14 +65,18 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
             JSXOpeningElement: path => {
                 const jsxOpeningElement = path.node;
 
-                if (
-                    this.isCursorPositionInJsxOpeningElement(cursorPosition, jsxOpeningElement) &&
-                    this.isCursorPositionInJsxAttribute(
-                        cursorPosition,
-                        jsxOpeningElement,
-                        path.scope
-                    )
-                ) {
+                const isCursorInJsxOpeningElement = this.isCursorInJsxOpeningElement(
+                    cursorPosition,
+                    jsxOpeningElement
+                );
+                
+                const isCursorInJsxAttribute = this.isCursorInJsxAttribute(
+                    cursorPosition,
+                    jsxOpeningElement,
+                    path.scope
+                );
+
+                if (isCursorInJsxOpeningElement && !isCursorInJsxAttribute) {
                     result = jsxOpeningElement;
                 }
             }
