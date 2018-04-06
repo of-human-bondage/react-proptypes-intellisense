@@ -1,44 +1,15 @@
-import {
-    CompletionItemProvider,
-    TextDocument,
-    Position,
-    CompletionItem,
-    commands,
-    Location,
-    Uri
-} from 'vscode';
-
-import { JSXOpeningElement, JSXIdentifier, JSXAttribute, Node } from 'babel-types';
 import babelTraverse, { Scope } from 'babel-traverse';
+import { JSXAttribute, JSXIdentifier, JSXOpeningElement, Node } from 'babel-types';
+import { CompletionItem, CompletionItemProvider, Position, TextDocument } from 'vscode';
 
 import getPropTypes from './getPropTypes';
-import { getAst } from './utils';
+import { getAst, getDefinition, isReactComponent } from './utils';
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
-    private async getDefinition(
-        documentUri: Uri,
-        position: Position
-    ): Promise<Location | undefined> {
-        const definitions = <{}[]>await commands.executeCommand(
-            'vscode.executeDefinitionProvider',
-            documentUri,
-            position
-        );
-
-        if (!definitions.length) {
-            return undefined;
-        }
-
-        return <Location>definitions[0];
-    }
     private getPropTypesFromJsxTag(jsxOpeningElement: JSXOpeningElement): string[] {
         return jsxOpeningElement.attributes.map((jsxAttribute: JSXAttribute): string => {
-            return (<JSXIdentifier>jsxAttribute.name).name;
+            return `${jsxAttribute.name.name}={}`;
         });
-    }
-
-    private isReactComponent(nameOfJsxTag: string): boolean {
-        return nameOfJsxTag[0] === nameOfJsxTag[0].toUpperCase();
     }
 
     private getStartTagPosition(jsxOpeningElement: JSXOpeningElement): Position {
@@ -124,13 +95,12 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         }
 
         const nameOfJsxTag = this.getNameOfJsxTag(jsxOpeningElement);
-        const isReactComponent = this.isReactComponent(nameOfJsxTag);
-        if (!isReactComponent) {
+        if (!isReactComponent(nameOfJsxTag)) {
             return [];
         }
 
         const startTagPosition = this.getStartTagPosition(jsxOpeningElement);
-        const tagDefinition = await this.getDefinition(document.uri, startTagPosition);
+        const tagDefinition = await getDefinition(document.uri, startTagPosition);
         if (!tagDefinition) {
             return [];
         }
@@ -138,9 +108,7 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         const parsedPropTypes = this.getPropTypesFromJsxTag(jsxOpeningElement);
 
         const propTypes = (await getPropTypes(tagDefinition.uri, tagDefinition.range)).filter(
-            propType => {
-                return parsedPropTypes.indexOf(<string>propType.insertText) === -1;
-            }
+            propType => parsedPropTypes.indexOf(<string>propType.insertText) === -1
         );
 
         return propTypes;

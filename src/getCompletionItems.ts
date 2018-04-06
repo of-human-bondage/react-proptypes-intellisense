@@ -5,6 +5,16 @@ import babelTraverse, { Scope } from 'babel-traverse';
 
 import { sourceLocationToRange, formatJSString, isRequiredPropType } from './utils';
 
+const MOVE_CURSOR_TO_LEFT = {
+    title: 'cursorMove',
+    command: 'cursorMove',
+    arguments: [
+        {
+            to: 'left'
+        }
+    ]
+};
+
 const getMinimalPropTypeDetail = (propTypeValue: string): string => {
     const separatedPropTypeValue = propTypeValue.split(/\(|\)/g);
 
@@ -33,12 +43,15 @@ const getCompletionItem = (
     const propTypeName = `${objectPropertyName}${
         isRequiredPropType(objectPropertyValue) ? '' : '?'
     }`;
-    const detail = getMinimalPropTypeDetail(objectPropertyValue);
+    const detail = `(property) ${objectPropertyName}: ${getMinimalPropTypeDetail(
+        objectPropertyValue
+    )}`;
     const documentation = getMarkdownString(objectPropertyValue);
 
     const completionItem = new CompletionItem(propTypeName, CompletionItemKind.Field);
     completionItem.sortText = ''; // move on the top of the list
-    completionItem.insertText = objectPropertyName;
+    completionItem.insertText = `${objectPropertyName}={}`;
+    completionItem.command = MOVE_CURSOR_TO_LEFT;
     completionItem.detail = detail;
     completionItem.documentation = documentation;
 

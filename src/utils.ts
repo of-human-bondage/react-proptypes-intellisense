@@ -1,7 +1,7 @@
 import { File, SourceLocation } from 'babel-types';
 import { parse } from 'babylon';
-import { Range, Position } from 'vscode';
 import * as prettier from 'prettier';
+import { Location, Position, Range, Uri, commands } from 'vscode';
 
 export const getAst = (fileText: string): File => {
     return parse(fileText, {
@@ -42,9 +42,25 @@ export const formatJSString = (jsString: string): string => {
 export const isRequiredPropType = (propType: string): boolean => {
     const propTypeSeparatedByDot = propType.split('.');
 
-    if (propTypeSeparatedByDot[propTypeSeparatedByDot.length - 1] === 'isRequired') {
-        return true;
+    return propTypeSeparatedByDot[propTypeSeparatedByDot.length - 1] === 'isRequired';
+};
+
+export const getDefinition = async (
+    documentUri: Uri,
+    position: Position
+): Promise<Location | undefined> => {
+    const definitions = <{}[]>await commands.executeCommand(
+        'vscode.executeDefinitionProvider',
+        documentUri,
+        position
+    );
+
+    if (!definitions.length) {
+        return undefined;
     }
 
-    return false;
+    return <Location>definitions[0];
 };
+
+export const isReactComponent = (nameOfJsxTag: string): boolean =>
+    nameOfJsxTag[0] === nameOfJsxTag[0].toUpperCase();

@@ -103,22 +103,22 @@ suite('Extension', () => {
         'boolProp?',
         vscode.CompletionItemKind.Field
     );
-    boolCompletionItem.detail = 'PropTypes.bool';
-    boolCompletionItem.insertText = 'boolProp';
+    boolCompletionItem.detail = '(property) boolProp: PropTypes.bool';
+    boolCompletionItem.insertText = 'boolProp={}';
 
     let funcCompletionItem = new vscode.CompletionItem(
         'funcProp?',
         vscode.CompletionItemKind.Field
     );
-    funcCompletionItem.detail = 'PropTypes.func';
-    funcCompletionItem.insertText = 'funcProp';
+    funcCompletionItem.detail = '(property) funcProp: PropTypes.func';
+    funcCompletionItem.insertText = 'funcProp={}';
 
     let objCompletionItem = new vscode.CompletionItem(
         'objectProp?',
         vscode.CompletionItemKind.Field
     );
-    objCompletionItem.detail = 'PropTypes.object';
-    objCompletionItem.insertText = 'objectProp';
+    objCompletionItem.detail = '(property) objectProp: PropTypes.object';
+    objCompletionItem.insertText = 'objectProp={}';
 
     const proposal = [boolCompletionItem, funcCompletionItem, objCompletionItem];
     test('Find props for an imported component', () => {
@@ -171,8 +171,8 @@ suite('Extension', () => {
             'where the suggestion was triggered from. It has a required prop',
         () => {
             const proposal = new vscode.CompletionItem('boolProp', vscode.CompletionItemKind.Field);
-            proposal.detail = 'PropTypes.bool.isRequired';
-            proposal.insertText = 'boolProp';
+            proposal.detail = '(property) boolProp: PropTypes.bool.isRequired';
+            proposal.insertText = 'boolProp={}';
 
             const cursorPositionForComponent = new vscode.Position(36, 40);
             return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [proposal]);
@@ -187,8 +187,8 @@ suite('Extension', () => {
                 'shapeProp',
                 vscode.CompletionItemKind.Field
             );
-            proposal.detail = 'PropTypes.shape(...).isRequired';
-            proposal.insertText = 'shapeProp';
+            proposal.detail = '(property) shapeProp: PropTypes.shape(...).isRequired';
+            proposal.insertText = 'shapeProp={}';
 
             const cursorPositionForComponent = new vscode.Position(36, 40);
             return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [proposal]);
