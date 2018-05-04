@@ -7,7 +7,7 @@
 The extension finds React PropTypes and adds them to the suggestion list.
 
 
-\!\[react-proptypes-intellisense\]\(images/ReactProptypesIntelliSense.gif\)
+![react-proptypes-intellisense](images/ReactProptypesIntelliSense.gif)
 
 It works for all implementations of the "PropTypes" feature, i.e. static propTypes, proptypes from a prototype, etc.
 
