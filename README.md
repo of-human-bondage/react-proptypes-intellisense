@@ -6,12 +6,26 @@
 
 The extension finds React PropTypes and adds them to the suggestion list.
 
-
 ![react-proptypes-intellisense](images/ReactProptypesIntelliSense.gif)
 
 It works for all implementations of the "PropTypes" feature, i.e. static propTypes, proptypes from a prototype, etc.
 
+## Problems
 
+If the extension doesn't work try to configure jsconfig.json.
+
+Your imports have to be resolved to work with this extension:
+
+```json
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "baseUrl": "./src/js"
+    }
+}
+```
+
+"baseUrl" - base directory to resolve imports
 
 ### 1.0.0
 
