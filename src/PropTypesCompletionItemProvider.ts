@@ -69,7 +69,7 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
                     cursorPosition,
                     jsxOpeningElement
                 );
-                
+
                 const isCursorInJsxAttribute = this.isCursorInJsxAttribute(
                     cursorPosition,
                     jsxOpeningElement,
