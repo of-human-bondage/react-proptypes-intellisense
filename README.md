@@ -14,7 +14,7 @@ It works for all implementations of the "PropTypes" feature, i.e. static propTyp
 
 If the extension doesn't work try to configure jsconfig.json.
 
-Your imports have to be resolved for working this extension:
+Your imports have to be resolved to work with this extension:
 
 ```json
 {
