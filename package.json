@@ -2,14 +2,31 @@
   "name": "react-proptypes-intellisense",
   "displayName": "React PropTypes Intellisense",
   "description": "PropTypes intellisense for React components",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "kv4sha",
+  "icon": "images/logo.png",
   "engines": {
     "vscode": "^1.21.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Programming Languages"
   ],
+  "keywords": [
+    "React",
+    "Intellisense",
+    "PropTypes",
+    "suggest"
+  ],
+  "bugs": {
+    "url": "https://github.com/of-human-bondage/react-proptypes-intellisense/issues",
+    "email": "kv4sha@gmail.com"
+  },
+  "homepage": "https://github.com/of-human-bondage/react-proptypes-intellisense/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/of-human-bondage/react-proptypes-intellisense.git"
+  },
   "activationEvents": [
     "onLanguage:javascript",
     "onLanguage:javascriptreact"
