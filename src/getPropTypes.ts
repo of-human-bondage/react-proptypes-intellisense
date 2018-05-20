@@ -25,6 +25,9 @@ export default async (
     const componentName = getComponentName(componentTextDocument, componentNameLocation);
 
     const ast = getAst(componentTextDocument.getText());
+    if (!ast) {
+        return [];
+    }
 
     const componentPropTypesFromStatic = getPropTypesFromStatic(
         componentTextDocument,
