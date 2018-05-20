@@ -5,6 +5,7 @@ import ComponentToImport from './ComponentToImport';
 import ComponentWithPropsInPrototype from './ComponentWithPropsInPrototype';
 import ComponentWithStaticPropTypes from './ComponentWithStaticPropTypes';
 import ComponentWithoutProps from './ComponentWithoutProps';
+import ComponentWithIncorrectSyntax from './ComponentWithIncorrectSyntax';
 
 export default class MainComponent extends React.Component {
     render() {
@@ -37,6 +38,7 @@ export default class MainComponent extends React.Component {
                 <ComponentInTheSameFile />
                 <ComponentWithoutProps />
                 <NotImportedComponent />
+                <ComponentWithIncorrectSyntax />
 
             </div>
         );

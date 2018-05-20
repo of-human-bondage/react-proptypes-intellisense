@@ -3,23 +3,27 @@ import { parse } from 'babylon';
 import * as prettier from 'prettier';
 import { Location, Position, Range, Uri, commands } from 'vscode';
 
-export const getAst = (fileText: string): File => {
-    return parse(fileText, {
-        sourceType: 'module',
-        plugins: [
-            'jsx',
-            'flow',
-            'doExpressions',
-            'objectRestSpread',
-            'decorators',
-            'classProperties',
-            'exportExtensions',
-            'asyncGenerators',
-            'functionBind',
-            'functionSent',
-            'dynamicImport'
-        ]
-    });
+export const getAst = (fileText: string): File | undefined => {
+    try {
+        return parse(fileText, {
+            sourceType: 'module',
+            plugins: [
+                'jsx',
+                'flow',
+                'doExpressions',
+                'objectRestSpread',
+                'decorators',
+                'classProperties',
+                'exportExtensions',
+                'asyncGenerators',
+                'functionBind',
+                'functionSent',
+                'dynamicImport'
+            ]
+        });
+    } catch (error) {
+        return undefined;
+    }
 };
 
 export const sourceLocationToRange = (sourceLocation: SourceLocation): Range => {
