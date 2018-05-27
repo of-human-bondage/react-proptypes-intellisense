@@ -3,7 +3,7 @@
   "displayName": "React PropTypes Intellisense",
   "description": "PropTypes intellisense for React components",
   "version": "1.0.0",
-  "publisher": "of-human-bondage",
+  "publisher": "OfHumanBondage",
   "icon": "images/logo.png",
   "engines": {
     "vscode": "^1.21.0"
