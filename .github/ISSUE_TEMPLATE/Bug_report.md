@@ -4,32 +4,42 @@ about: Create a report to help us improve
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+<!---
+Thanks for filing an issue 😄 ! Before you submit, please read the following:
 
-**To Reproduce**
+Search open/closed issues before submitting since someone might have asked the same thing before!
+-->
+
+# 🐛 bug report
+
+<!--- Provide a general summary of the issue here -->
+
+## To Reproduce
+<!---
 Steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
-3. Scroll down to '....'
-4. See error
+--->
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## 🤔 Expected Behavior
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+<!--- Tell us what should happen -->
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## 😯 Current Behavior
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+<!--- Tell us what happens instead of the expected behavior -->
 
-**Additional context**
-Add any other context about the problem here.
+<!--- If you are seeing an error, please include the full error message and stack trace -->
+
+## Screenshots
+<!--- If applicable, add screenshots to help explain your problem. -->
+
+## Environment 
+<!---
+  (please complete the following information)
+ - OS: [e.g. macOS]
+ - VS Code Version [e.g. 1.21.*]
+--->
+
+## Additional context
+<!--- Add any other context about the problem here. --->
