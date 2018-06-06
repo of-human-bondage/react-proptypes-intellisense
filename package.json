@@ -2,7 +2,7 @@
   "name": "react-proptypes-intellisense",
   "displayName": "React PropTypes Intellisense",
   "description": "PropTypes intellisense for React components",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "OfHumanBondage",
   "icon": "images/logo.png",
   "engines": {
