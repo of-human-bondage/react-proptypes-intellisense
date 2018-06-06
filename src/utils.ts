@@ -55,7 +55,7 @@ export const getDefinition = async (
     position: Position
 ): Promise<Location | undefined> => {
     const definitions = <{}[]>await commands.executeCommand(
-        'vscode.executeDefinitionProvider',
+        'vscode.executeTypeDefinitionProvider',
         documentUri,
         position
     );
