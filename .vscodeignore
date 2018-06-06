@@ -1,0 +1,15 @@
+.vscode/**
+coverage/**
+out/test/**
+src/**
+test/**
+testWorkspace/**
+**/*.map
+.gitignore
+.travis.yml
+.vscodeignore
+appveyor.yml
+coverconfig.json
+tsconfig.json
+tslint.json
+vsc-extension-quickstart.md

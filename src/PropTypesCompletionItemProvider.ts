@@ -58,6 +58,9 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         const cursorPosition = document.offsetAt(position);
 
         const ast = getAst(documentText);
+        if (!ast) {
+            return undefined;
+        }
 
         let result: JSXOpeningElement | undefined;
 
