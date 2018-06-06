@@ -26,7 +26,3 @@ Your imports have to be resolved to work with this extension:
 ```
 
 "baseUrl" - base directory to resolve imports
-
-### 1.0.0
-
-Initial release

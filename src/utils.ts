@@ -2,6 +2,7 @@ import { File, SourceLocation } from 'babel-types';
 import { parse } from 'babylon';
 import * as prettier from 'prettier';
 import { Location, Position, Range, Uri, commands } from 'vscode';
+import { basename } from 'path';
 
 export const getAst = (fileText: string): File | undefined => {
     try {
@@ -54,7 +55,7 @@ export const getDefinition = async (
     position: Position
 ): Promise<Location | undefined> => {
     const definitions = <{}[]>await commands.executeCommand(
-        'vscode.executeDefinitionProvider',
+        'vscode.executeTypeDefinitionProvider',
         documentUri,
         position
     );
@@ -68,3 +69,5 @@ export const getDefinition = async (
 
 export const isReactComponent = (nameOfJsxTag: string): boolean =>
     nameOfJsxTag[0] === nameOfJsxTag[0].toUpperCase();
+
+export const isPathToTypingFile = (path: string): boolean => basename(path).includes('.d.ts');

@@ -3,7 +3,7 @@ import { JSXAttribute, JSXIdentifier, JSXOpeningElement, Node } from 'babel-type
 import { CompletionItem, CompletionItemProvider, Position, TextDocument } from 'vscode';
 
 import getPropTypes from './getPropTypes';
-import { getAst, getDefinition, isReactComponent } from './utils';
+import { getAst, getDefinition, isReactComponent, isPathToTypingFile } from './utils';
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
     private getPropTypesFromJsxTag(jsxOpeningElement: JSXOpeningElement): string[] {
@@ -104,7 +104,7 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
 
         const startTagPosition = this.getStartTagPosition(jsxOpeningElement);
         const tagDefinition = await getDefinition(document.uri, startTagPosition);
-        if (!tagDefinition) {
+        if (!tagDefinition || isPathToTypingFile(tagDefinition.uri.path)) {
             return [];
         }
 
