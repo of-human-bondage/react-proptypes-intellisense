@@ -18,7 +18,8 @@ import * as path from 'path';
 const checkCompletionItemsForSpecificPosition = (
     cursorPositionForComponent: vscode.Position,
     proposals: Array<vscode.CompletionItem>,
-    itemsShouldExist: boolean = true
+    itemsShouldExist: boolean = true,
+    fileToOpenInWorkspace: string = 'index.jsx'
 ) => {
     const workspace = vscode.workspace;
 
@@ -26,16 +27,19 @@ const checkCompletionItemsForSpecificPosition = (
     assert.ok(workspaceFolders!.length > 0);
     const workspaceFolder = workspaceFolders![0];
     assert.ok(pathEquals(workspaceFolder.uri.fsPath, path.join(__dirname, '../../testWorkspace')));
-    const indexJsxPath = path.join(workspaceFolder.uri.fsPath, './index.jsx');
-    const indexJsxUriPath = vscode.Uri.file(indexJsxPath);
+    const fullPathToFileToOpen = path.join(
+        workspaceFolder.uri.fsPath,
+        `./${fileToOpenInWorkspace}`
+    );
+    const fileToOpenUriPath = vscode.Uri.file(fullPathToFileToOpen);
 
     return workspace
-        .openTextDocument(indexJsxPath)
+        .openTextDocument(fullPathToFileToOpen)
         .then(vscode.window.showTextDocument)
         .then(document => {
             return vscode.commands.executeCommand<vscode.CompletionList>(
                 'vscode.executeCompletionItemProvider',
-                indexJsxUriPath,
+                fileToOpenUriPath,
                 cursorPositionForComponent
             );
         })
@@ -73,13 +77,13 @@ suite('Extension', () => {
         assert.ok(
             pathEquals(workspaceFolder.uri.fsPath, path.join(__dirname, '../../testWorkspace'))
         );
-        const indexJsxPath = path.join(workspaceFolder.uri.fsPath, './index.jsx');
-        const indexJsxUriPath = vscode.Uri.file(indexJsxPath);
+        const fullPathToFileToOpen = path.join(workspaceFolder.uri.fsPath, './index.jsx');
+        const fileToOpenUriPath = vscode.Uri.file(fullPathToFileToOpen);
         const waitForDefinitions = (done: () => void) => {
             vscode.commands
                 .executeCommand(
                     'vscode.executeDefinitionProvider',
-                    indexJsxUriPath,
+                    fileToOpenUriPath,
                     componentNamePosition
                 )
                 .then((definitions: any) => {
@@ -92,7 +96,7 @@ suite('Extension', () => {
                 });
         };
         workspace
-            .openTextDocument(indexJsxPath)
+            .openTextDocument(fullPathToFileToOpen)
             .then(vscode.window.showTextDocument)
             .then(() => {
                 waitForDefinitions(done);
@@ -223,5 +227,16 @@ suite('Extension', () => {
         const cursorPositionForComponent = new vscode.Position(40, 46);
 
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+    });
+
+    test('Find props for a stateless component in *.js file', () => {
+        const cursorPositionForComponent = new vscode.Position(7, 36);
+
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [boolCompletionItem],
+            true,
+            'index.js'
+        );
     });
 });
