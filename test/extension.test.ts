@@ -36,7 +36,7 @@ const checkCompletionItemsForSpecificPosition = (
     return workspace
         .openTextDocument(fullPathToFileToOpen)
         .then(vscode.window.showTextDocument)
-        .then(document => {
+        .then(() => {
             return vscode.commands.executeCommand<vscode.CompletionList>(
                 'vscode.executeCompletionItemProvider',
                 fileToOpenUriPath,
@@ -46,7 +46,7 @@ const checkCompletionItemsForSpecificPosition = (
         .then((result: vscode.CompletionList | undefined) => {
             proposals.forEach(elem => {
                 const ifCompletionItemWasPresent = result!.items.find(
-                    (item: vscode.CompletionItem, index: number) => {
+                    (item: vscode.CompletionItem) => {
                         return completionItemsEquals(elem, item);
                     }
                 );
@@ -237,6 +237,17 @@ suite('Extension', () => {
             [boolCompletionItem],
             true,
             'index.js'
+        );
+    });
+
+    test('Find props for a component with spread operator', () => {
+        const cursorPositionForComponent = new vscode.Position(9, 45);
+
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [boolCompletionItem, funcCompletionItem],
+            true,
+            'ComponentWithSpreadOperator.jsx'
         );
     });
 });
