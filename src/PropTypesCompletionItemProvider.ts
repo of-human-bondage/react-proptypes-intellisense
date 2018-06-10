@@ -1,5 +1,11 @@
 import babelTraverse, { Scope } from 'babel-traverse';
-import { JSXAttribute, JSXIdentifier, JSXOpeningElement, Node } from 'babel-types';
+import {
+    JSXAttribute,
+    JSXIdentifier,
+    JSXOpeningElement,
+    JSXSpreadAttribute,
+    Node
+} from 'babel-types';
 import { CompletionItem, CompletionItemProvider, Position, TextDocument } from 'vscode';
 
 import getPropTypes from './getPropTypes';
@@ -7,9 +13,15 @@ import { getAst, getDefinition, isReactComponent, isPathToTypingFile } from './u
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
     private getPropTypesFromJsxTag(jsxOpeningElement: JSXOpeningElement): string[] {
-        return jsxOpeningElement.attributes.map((jsxAttribute: JSXAttribute): string => {
-            return `${jsxAttribute.name.name}={}`;
-        });
+        return jsxOpeningElement.attributes.map(
+            (jsxAttribute: JSXAttribute | JSXSpreadAttribute): string => {
+                if ('argument' in jsxAttribute) {
+                    return '...={}';
+                }
+
+                return `${(<JSXAttribute>jsxAttribute).name.name}={}`;
+            }
+        );
     }
 
     private getStartTagPosition(jsxOpeningElement: JSXOpeningElement): Position {
