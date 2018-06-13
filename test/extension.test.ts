@@ -125,10 +125,17 @@ suite('Extension', () => {
     objCompletionItem.insertText = 'objectProp={}';
 
     const proposal = [boolCompletionItem, funcCompletionItem, objCompletionItem];
+
     test('Find props for an imported component', () => {
-        const cursorPositionForComponent = new vscode.Position(19, 35);
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
+        const cursorPositionForComponent = new vscode.Position(14, 35);
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            proposal,
+            true,
+            'ImportedComponentTest.jsx'
+        );
     });
+
     test('Find props for an imported component with static propTypes', () => {
         const cursorPositionForComponent = new vscode.Position(20, 46);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
