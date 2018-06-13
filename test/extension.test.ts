@@ -209,8 +209,13 @@ suite('Extension suggestions integration tests', () => {
             proposal.detail = '(property) shapeProp: PropTypes.shape(...).isRequired';
             proposal.insertText = 'shapeProp={}';
 
-            const cursorPositionForComponent = new vscode.Position(37, 40);
-            return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [proposal]);
+            const cursorPositionForComponent = new vscode.Position(7, 40);
+            return checkCompletionItemsForSpecificPosition(
+                cursorPositionForComponent,
+                [proposal],
+                true,
+                'ComponentShapePropTest.jsx'
+            );
         }
     );
 
