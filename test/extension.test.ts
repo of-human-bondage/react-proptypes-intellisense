@@ -188,8 +188,13 @@ suite('Extension suggestions integration tests', () => {
             proposal.detail = '(property) boolProp: PropTypes.bool.isRequired';
             proposal.insertText = 'boolProp={}';
 
-            const cursorPositionForComponent = new vscode.Position(37, 40);
-            return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [proposal]);
+            const cursorPositionForComponent = new vscode.Position(7, 43);
+            return checkCompletionItemsForSpecificPosition(
+                cursorPositionForComponent,
+                [proposal],
+                true,
+                'ComponentRequiredPropTest.jsx'
+            );
         }
     );
 
