@@ -242,9 +242,14 @@ suite('Extension suggestions integration tests', () => {
     });
 
     test('Find props for a component inside component attribute', () => {
-        const cursorPositionForComponent = new vscode.Position(24, 37);
+        const cursorPositionForComponent = new vscode.Position(6, 48);
 
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [],
+            true,
+            'TriggerSuggestionInsideComponentAttributeTest.jsx'
+        );
     });
 
     test('Find props for a component from file with incorrect syntax', () => {
