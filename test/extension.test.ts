@@ -137,9 +137,15 @@ suite('Extension suggestions integration tests', () => {
     });
 
     test('Find props for an imported component with static propTypes', () => {
-        const cursorPositionForComponent = new vscode.Position(20, 46);
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
+        const cursorPositionForComponent = new vscode.Position(7, 46);
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            proposal,
+            true,
+            'ImportedComponentWithStaticProptypesTest.jsx'
+        );
     });
+
     test(
         'Find props for an imported component with static propTypes ' +
             'that already has some props',
