@@ -146,38 +146,32 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
-    test(
-        'Find props for an imported component ' +
-            'that already has some props',
-        () => {
-            const cursorPositionForComponent = new vscode.Position(9, 20);
-            const proposalWithoutBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
-                return item.label !== 'boolProp?' && item.label !== 'funcProp?';
-            });
-            return checkCompletionItemsForSpecificPosition(
-                cursorPositionForComponent,
-                proposalWithoutBoolItem,
-                true,
-                'ImportedComponentWithExistingPropsTest.jsx'
-            );
-        }
-    );
+    test('Find props for an imported component ' + 'that already has some props', () => {
+        const cursorPositionForComponent = new vscode.Position(9, 20);
+        const proposalWithoutBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
+            return item.label !== 'boolProp?' && item.label !== 'funcProp?';
+        });
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            proposalWithoutBoolItem,
+            true,
+            'ImportedComponentWithExistingPropsTest.jsx'
+        );
+    });
 
-    test(
-        'Find props for an imported component ' +
-            'that already has all props',
-        () => {
-            const cursorPositionForComponent = new vscode.Position(34, 20);
-            return checkCompletionItemsForSpecificPosition(
-                cursorPositionForComponent,
-                proposal,
-                false
-            );
-        }
-    );
+    test('Find props for an imported component ' + 'that already has all props', () => {
+        const cursorPositionForComponent = new vscode.Position(34, 20);
+        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal, false);
+    });
+
     test('Find props for a component with propTypes inside the prototype', () => {
-        const cursorPositionForComponent = new vscode.Position(36, 47);
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal);
+        const cursorPositionForComponent = new vscode.Position(7, 47);
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            proposal,
+            true,
+            'ImportedComponentWithPropsInPrototypeTest.jsx'
+        );
     });
 
     test('Find props for an imported component without propTypes', () => {
