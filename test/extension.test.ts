@@ -67,7 +67,7 @@ const checkCompletionItemsForSpecificPosition = (
         });
 };
 
-suite('Extension', () => {
+suite('Extension suggestions integration tests', () => {
     suiteSetup(done => {
         const componentNamePosition = new vscode.Position(19, 17);
         const workspace = vscode.workspace;
