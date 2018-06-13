@@ -146,7 +146,7 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
-    test('Find props for an imported component ' + 'that already has some props', () => {
+    test('Find props for an imported component that already has some props', () => {
         const cursorPositionForComponent = new vscode.Position(9, 20);
         const proposalWithoutBoolItem: vscode.CompletionItem[] = proposal.filter(item => {
             return item.label !== 'boolProp?' && item.label !== 'funcProp?';
@@ -159,7 +159,7 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
-    test('Find props for an imported component ' + 'that already has all props', () => {
+    test('Find props for an imported component that already has all props', () => {
         const cursorPositionForComponent = new vscode.Position(34, 20);
         return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal, false);
     });
