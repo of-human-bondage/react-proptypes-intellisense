@@ -219,16 +219,11 @@ suite('Extension suggestions integration tests', () => {
         }
     );
 
-    test('Find props outside a component', () => {
-        const cursorPositionForComponent = new vscode.Position(38, 16);
+    test('Find props for non component element', () => {
+        const cursorPositionForComponent = new vscode.Position(5, 43);
 
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
-    });
-
-    test('Find props for <div></div>', () => {
-        const cursorPositionForComponent = new vscode.Position(12, 17);
-
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [],true,
+        'TriggerExtensionNotForAComponentTest.jsx');
     });
 
     test("Find props for isn't imported component", () => {
