@@ -222,14 +222,23 @@ suite('Extension suggestions integration tests', () => {
     test('Find props for non component element', () => {
         const cursorPositionForComponent = new vscode.Position(5, 43);
 
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, [],true,
-        'TriggerExtensionNotForAComponentTest.jsx');
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [],
+            true,
+            'TriggerExtensionNotForAComponentTest.jsx'
+        );
     });
 
     test("Find props for isn't imported component", () => {
-        const cursorPositionForComponent = new vscode.Position(39, 38);
+        const cursorPositionForComponent = new vscode.Position(5, 43);
 
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [],
+            true,
+            'NonImportedComponentTest.jsx'
+        );
     });
 
     test('Find props for a component inside component attribute', () => {
