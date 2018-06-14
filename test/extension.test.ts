@@ -270,7 +270,7 @@ suite('Extension suggestions integration tests', () => {
             cursorPositionForComponent,
             [boolCompletionItem],
             true,
-            'index.js'
+            'StatelessJSComponentTest.js'
         );
     });
 
