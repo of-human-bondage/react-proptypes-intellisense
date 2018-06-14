@@ -159,9 +159,14 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
-    test('Find props for an imported component that already has all props', () => {
-        const cursorPositionForComponent = new vscode.Position(34, 20);
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, proposal, false);
+    test('Find props for an component that already has all props', () => {
+        const cursorPositionForComponent = new vscode.Position(13, 20);
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            proposal,
+            false,
+            'ComponentWithAllPropsTest.jsx'
+        );
     });
 
     test('Find props for a component with propTypes inside the prototype', () => {
