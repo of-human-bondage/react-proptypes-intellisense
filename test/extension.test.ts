@@ -253,9 +253,14 @@ suite('Extension suggestions integration tests', () => {
     });
 
     test('Find props for a component from file with incorrect syntax', () => {
-        const cursorPositionForComponent = new vscode.Position(40, 46);
+        const cursorPositionForComponent = new vscode.Position(7, 46);
 
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [],
+            true,
+            'IncorrectSyntaxComponentTest.jsx'
+        );
     });
 
     test('Find props for a stateless component in *.js file', () => {
