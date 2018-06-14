@@ -175,9 +175,14 @@ suite('Extension suggestions integration tests', () => {
     });
 
     test('Find props for an imported component without propTypes', () => {
-        const cursorPositionForComponent = new vscode.Position(38, 39);
+        const cursorPositionForComponent = new vscode.Position(7, 39);
 
-        return checkCompletionItemsForSpecificPosition(cursorPositionForComponent, []);
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [],
+            true,
+            'ComponentWithNoProptypesTest.jsx'
+        );
     });
 
     test(
