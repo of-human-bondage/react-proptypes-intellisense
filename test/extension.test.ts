@@ -69,7 +69,7 @@ const checkCompletionItemsForSpecificPosition = (
 
 suite('Extension suggestions integration tests', () => {
     suiteSetup(done => {
-        const componentNamePosition = new vscode.Position(19, 17);
+        const componentNamePosition = new vscode.Position(13, 28);
         const workspace = vscode.workspace;
         const workspaceFolders = workspace!.workspaceFolders;
         assert.ok(workspaceFolders!.length > 0);
