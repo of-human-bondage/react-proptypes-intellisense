@@ -18,8 +18,8 @@ import * as path from 'path';
 const checkCompletionItemsForSpecificPosition = (
     cursorPositionForComponent: vscode.Position,
     proposals: Array<vscode.CompletionItem>,
-    itemsShouldExist: boolean = true,
-    fileToOpenInWorkspace: string = 'index.jsx'
+    fileToOpenInWorkspace: string = 'index.jsx',
+    itemsShouldExist: boolean = true
 ) => {
     const workspace = vscode.workspace;
 
@@ -131,7 +131,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             proposal,
-            true,
             'ImportedComponentTest.jsx'
         );
     });
@@ -141,7 +140,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             proposal,
-            true,
             'ImportedComponentWithStaticProptypesTest.jsx'
         );
     });
@@ -154,7 +152,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             proposalWithoutBoolItem,
-            true,
             'ImportedComponentWithExistingPropsTest.jsx'
         );
     });
@@ -164,8 +161,8 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             proposal,
-            false,
-            'ComponentWithAllPropsTest.jsx'
+            'ComponentWithAllPropsTest.jsx',
+            false
         );
     });
 
@@ -174,7 +171,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             proposal,
-            true,
             'ImportedComponentWithPropsInPrototypeTest.jsx'
         );
     });
@@ -185,7 +181,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [],
-            true,
             'ComponentWithNoProptypesTest.jsx'
         );
     });
@@ -202,7 +197,6 @@ suite('Extension suggestions integration tests', () => {
             return checkCompletionItemsForSpecificPosition(
                 cursorPositionForComponent,
                 [proposal],
-                true,
                 'ComponentRequiredPropTest.jsx'
             );
         }
@@ -223,7 +217,6 @@ suite('Extension suggestions integration tests', () => {
             return checkCompletionItemsForSpecificPosition(
                 cursorPositionForComponent,
                 [proposal],
-                true,
                 'ComponentShapePropTest.jsx'
             );
         }
@@ -235,7 +228,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [],
-            true,
             'TriggerExtensionNotForAComponentTest.jsx'
         );
     });
@@ -246,7 +238,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [],
-            true,
             'NonImportedComponentTest.jsx'
         );
     });
@@ -257,7 +248,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [],
-            true,
             'TriggerSuggestionInsideComponentAttributeTest.jsx'
         );
     });
@@ -268,7 +258,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [],
-            true,
             'IncorrectSyntaxComponentTest.jsx'
         );
     });
@@ -279,7 +268,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [boolCompletionItem],
-            true,
             'StatelessJSComponentTest.js'
         );
     });
@@ -290,7 +278,6 @@ suite('Extension suggestions integration tests', () => {
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [boolCompletionItem, funcCompletionItem],
-            true,
             'ComponentWithSpreadOperator.jsx'
         );
     });
