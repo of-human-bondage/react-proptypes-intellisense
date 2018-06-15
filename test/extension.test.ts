@@ -19,7 +19,7 @@ const checkCompletionItemsForSpecificPosition = (
     cursorPositionForComponent: vscode.Position,
     proposals: Array<vscode.CompletionItem>,
     fileToOpenInWorkspace: string = 'index.jsx',
-    itemsShouldExist: boolean = true
+    areItemsShouldBePresented: boolean = true
 ) => {
     const workspace = vscode.workspace;
 
@@ -50,7 +50,7 @@ const checkCompletionItemsForSpecificPosition = (
                         return completionItemsEquals(elem, item);
                     }
                 );
-                if (itemsShouldExist) {
+                if (areItemsShouldBePresented) {
                     assert.notEqual(
                         ifCompletionItemWasPresent,
                         undefined,
