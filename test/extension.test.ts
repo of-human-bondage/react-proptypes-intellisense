@@ -295,4 +295,14 @@ suite('Extension suggestions integration tests', () => {
             'ComponentWithSpreadOperator.jsx'
         );
     });
+
+    test.skip('Find props for an anonymous component', () => {
+        const cursorPositionForComponent = new vscode.Position(7, 36);
+
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            proposal,
+            'ImportedAnonymousComponentTest.jsx'
+        );
+    });
 });
