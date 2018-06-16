@@ -272,13 +272,13 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
-    test('Find props for a stateless component in *.js file', () => {
+    test('Find props for a stateless component that is written as a function in *.js file', () => {
         const cursorPositionForComponent = new vscode.Position(7, 36);
 
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [boolCompletionItem],
-            'StatelessJSComponentTest.js'
+            'StatelessFunctionComponentJSTest.js'
         );
     });
 
