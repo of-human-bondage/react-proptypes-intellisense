@@ -166,22 +166,26 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
-    test('Find props for an component that already has all props from prototype', () => {
-        const cursorPositionForComponent = new vscode.Position(13, 20);
-        return checkCompletionItemsForSpecificPosition(
-            cursorPositionForComponent,
-            proposal,
-            'ComponentWithAllPropsInPrototypeTest.jsx',
-            false
-        );
-    });
+    test(
+        'Find props for a component with props from prototype that already has all props.' +
+            "The extension shouldn't find any suggestion",
+        () => {
+            const cursorPositionForComponent = new vscode.Position(13, 20);
+            return checkCompletionItemsForSpecificPosition(
+                cursorPositionForComponent,
+                proposal,
+                'ComponentWithAllPropsInPrototypeTest.jsx',
+                false
+            );
+        }
+    );
 
     test('Find props for a component with propTypes inside the prototype', () => {
         const cursorPositionForComponent = new vscode.Position(7, 47);
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             proposal,
-            'ImportedComponentWithPropsInPrototypeTest.jsx'
+            'ComponentWithPropsInPrototypeTest.jsx'
         );
     });
 
