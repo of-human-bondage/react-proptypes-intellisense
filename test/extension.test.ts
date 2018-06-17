@@ -166,22 +166,26 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
-    test('Find props for an component that already has all props from prototype', () => {
-        const cursorPositionForComponent = new vscode.Position(13, 20);
-        return checkCompletionItemsForSpecificPosition(
-            cursorPositionForComponent,
-            proposal,
-            'ComponentWithAllPropsInPrototypeTest.jsx',
-            false
-        );
-    });
+    test(
+        'Find props for a component with props from prototype that already has all props.' +
+            "The extension shouldn't find any suggestion",
+        () => {
+            const cursorPositionForComponent = new vscode.Position(13, 20);
+            return checkCompletionItemsForSpecificPosition(
+                cursorPositionForComponent,
+                proposal,
+                'ComponentWithAllPropsInPrototypeTest.jsx',
+                false
+            );
+        }
+    );
 
     test('Find props for a component with propTypes inside the prototype', () => {
         const cursorPositionForComponent = new vscode.Position(7, 47);
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             proposal,
-            'ImportedComponentWithPropsInPrototypeTest.jsx'
+            'ComponentWithPropsInPrototypeTest.jsx'
         );
     });
 
@@ -272,13 +276,13 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
-    test('Find props for a stateless component in *.js file', () => {
+    test('Find props for a stateless component that is written as a function in *.js file', () => {
         const cursorPositionForComponent = new vscode.Position(7, 36);
 
         return checkCompletionItemsForSpecificPosition(
             cursorPositionForComponent,
             [boolCompletionItem],
-            'StatelessJSComponentTest.js'
+            'StatelessFunctionComponentJSTest.js'
         );
     });
 
@@ -289,6 +293,26 @@ suite('Extension suggestions integration tests', () => {
             cursorPositionForComponent,
             [boolCompletionItem, funcCompletionItem],
             'ComponentWithSpreadOperator.jsx'
+        );
+    });
+
+    test.skip('Find props for an anonymous component', () => {
+        const cursorPositionForComponent = new vscode.Position(7, 36);
+
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            proposal,
+            'ImportedAnonymousComponentTest.jsx'
+        );
+    });
+
+    test.skip('Find props for a stateless component written with an arrow function', () => {
+        const cursorPositionForComponent = new vscode.Position(7, 36);
+
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [boolCompletionItem],
+            'StatelessComponentArrowFunctionTest.jsx'
         );
     });
 });

@@ -1,7 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default class ComponentToImport extends React.Component {
+export default class extends React.Component {
+    static propTypes = {
+        boolProp: PropTypes.bool,
+        funcProp: PropTypes.func,
+        objectProp: PropTypes.object
+    };
     render() {
         return (
             <div className="classislav">
@@ -10,9 +15,3 @@ export default class ComponentToImport extends React.Component {
         );
     }
 }
-
-ComponentToImport.prototype.propTypes = {
-    boolProp: PropTypes.bool,
-    funcProp: PropTypes.func,
-    objectProp: PropTypes.object
-};
