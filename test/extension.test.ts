@@ -296,6 +296,16 @@ suite('Extension suggestions integration tests', () => {
         );
     });
 
+    test('Find props for a stateless component written with an arrow function', () => {
+        const cursorPositionForComponent = new vscode.Position(7, 36);
+
+        return checkCompletionItemsForSpecificPosition(
+            cursorPositionForComponent,
+            [boolCompletionItem],
+            'StatelessComponentArrowFunctionTest.jsx'
+        );
+    });
+
     test.skip('Find props for an anonymous component', () => {
         const cursorPositionForComponent = new vscode.Position(7, 36);
 
@@ -303,16 +313,6 @@ suite('Extension suggestions integration tests', () => {
             cursorPositionForComponent,
             proposal,
             'ImportedAnonymousComponentTest.jsx'
-        );
-    });
-
-    test.skip('Find props for a stateless component written with an arrow function', () => {
-        const cursorPositionForComponent = new vscode.Position(7, 36);
-
-        return checkCompletionItemsForSpecificPosition(
-            cursorPositionForComponent,
-            [boolCompletionItem],
-            'StatelessComponentArrowFunctionTest.jsx'
         );
     });
 });
