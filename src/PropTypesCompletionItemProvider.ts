@@ -9,7 +9,7 @@ import {
 import { CompletionItem, CompletionItemProvider, Position, TextDocument } from 'vscode';
 
 import getPropTypes from './getPropTypes';
-import { getAst, getDefinition, isReactComponent, isPathToTypingFile } from './utils';
+import { getAst, getDefinition } from './utils';
 
 export default class PropTypesCompletionItemProvider implements CompletionItemProvider {
     private getPropTypesFromJsxTag(jsxOpeningElement: JSXOpeningElement): string[] {
@@ -31,8 +31,10 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         );
     }
 
-    private getNameOfJsxTag(jsxOpeningElement: JSXOpeningElement): string {
-        return (<JSXIdentifier>jsxOpeningElement.name).name;
+    private isReactComponent(jsxOpeningElement: JSXOpeningElement): boolean {
+        const nameOfJsxTag = (<JSXIdentifier>jsxOpeningElement.name).name;
+
+        return nameOfJsxTag[0] === nameOfJsxTag[0].toUpperCase();
     }
 
     private isCursorInJsxOpeningElement(
@@ -105,18 +107,13 @@ export default class PropTypesCompletionItemProvider implements CompletionItemPr
         position: Position
     ): Promise<CompletionItem[]> {
         const jsxOpeningElement = this.getJsxOpeningElement(document, position);
-        if (!jsxOpeningElement) {
-            return [];
-        }
-
-        const nameOfJsxTag = this.getNameOfJsxTag(jsxOpeningElement);
-        if (!isReactComponent(nameOfJsxTag)) {
+        if (!jsxOpeningElement || !this.isReactComponent(jsxOpeningElement)) {
             return [];
         }
 
         const startTagPosition = this.getStartTagPosition(jsxOpeningElement);
         const tagDefinition = await getDefinition(document.uri, startTagPosition);
-        if (!tagDefinition || isPathToTypingFile(tagDefinition.uri.path)) {
+        if (!tagDefinition) {
             return [];
         }
 
