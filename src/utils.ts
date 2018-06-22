@@ -50,24 +50,27 @@ export const isRequiredPropType = (propType: string): boolean => {
     return propTypeSeparatedByDot[propTypeSeparatedByDot.length - 1] === 'isRequired';
 };
 
+const isPathToTypingFile = (path: string): boolean => basename(path).endsWith('.d.ts');
+
 export const getDefinition = async (
     documentUri: Uri,
     position: Position
 ): Promise<Location | undefined> => {
-    const definitions = <{}[]>await commands.executeCommand(
-        'vscode.executeTypeDefinitionProvider',
+    const definitions = <Location[]>await commands.executeCommand(
+        'vscode.executeDefinitionProvider',
         documentUri,
         position
     );
 
-    if (!definitions.length) {
+    const definitionsWithoutTypings = definitions.filter(
+        (definition: Location) => !isPathToTypingFile(definition.uri.path)
+    );
+
+    const length = definitionsWithoutTypings.length;
+
+    if (!length) {
         return undefined;
     }
 
-    return <Location>definitions[0];
+    return definitionsWithoutTypings[length - 1];
 };
-
-export const isReactComponent = (nameOfJsxTag: string): boolean =>
-    nameOfJsxTag[0] === nameOfJsxTag[0].toUpperCase();
-
-export const isPathToTypingFile = (path: string): boolean => basename(path).includes('.d.ts');
