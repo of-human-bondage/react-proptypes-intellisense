@@ -54,6 +54,7 @@
   "dependencies": {
     "@types/glob": "^5.0.35",
     "babel-traverse": "^6.26.0",
+    "babel-types": "^6.26.0",
     "babylon": "^6.18.0",
     "decache": "^4.4.0",
     "glob": "^7.1.2",
