@@ -2,7 +2,10 @@
 
 All notable changes to the "react-proptypes-intellisense" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.0.2]
+
+*   Fix the ability to work with stateless components files (https://github.com/of-human-bondage/react-proptypes-intellisense/issues/46)
+*   A bit of refactoring and bug fixes
 
 ## [1.0.1]
 
