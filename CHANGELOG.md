@@ -2,6 +2,10 @@
 
 All notable changes to the "react-proptypes-intellisense" extension will be documented in this file.
 
+## [1.0.3]
+
+*   Fix problems with 1.26 vscode
+
 ## [1.0.2]
 
 *   Fix the ability to work with stateless components files (https://github.com/of-human-bondage/react-proptypes-intellisense/issues/46)
